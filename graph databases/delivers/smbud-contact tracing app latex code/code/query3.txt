@@ -1,0 +1,8 @@
+match 
+(p:Person)-[:TAKES]->(t:Test), 
+(p)-[v:VISITED]->(:Location) 
+where 
+t.Result='positive' and
+t.Time > (v.StartTime-duration('P10D')) and
+t.Time < v.EndTime 
+return p

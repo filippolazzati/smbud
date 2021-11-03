@@ -1,0 +1,2 @@
+LOAD CSV WITH HEADERS FROM 'file:///locations.csv' AS row
+MERGE (l:Location {Id: row.ID, Description: row.Description, Address: row.Address});

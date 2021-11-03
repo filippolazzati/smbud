@@ -1,0 +1,5 @@
+MATCH
+  (p:Person),
+  (t:Test)
+WHERE t.PersonId=p.Id
+CREATE (p)-[r:TAKES]->(t)

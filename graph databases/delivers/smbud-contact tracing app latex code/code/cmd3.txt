@@ -1,0 +1,5 @@
+MATCH
+  (p:Person),
+  (l:Location)
+WHERE p.HomeLocationId=l.Id
+CREATE (p)-[r:LIVES_IN]->(l)

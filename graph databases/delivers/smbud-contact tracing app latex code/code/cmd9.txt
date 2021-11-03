@@ -1,0 +1,4 @@
+LOAD CSV WITH HEADERS FROM 'file:///contacts.csv' AS row
+MATCH (p: Person), (q: Person)
+WHERE p.Id <> q.Id AND p.Id = row.Person1Id AND q.Id = row.Person2Id
+CREATE (p)-[r:CONTACT {StartTime: datetime({epochSeconds: toInteger(row.StartTime)}), EndTime: datetime({epochSeconds: toInteger(row.EndTime)})}]->(q);

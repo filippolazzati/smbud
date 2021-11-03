@@ -1,0 +1,8 @@
+match
+(p:Person{Id:'xxx'}) -[c1:CONTACT]- (q:Person), (q:Person) -[c2:CONTACT]- (r:Person)
+where
+ p <> q and p <> r and q <> r and
+c1.EndTime > (date()-duration('P5D'))
+and c2.StartTime > C1.StartTime
+and c2.EndTime > (date()-duration('P5D'))
+return r

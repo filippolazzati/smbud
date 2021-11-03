@@ -1,0 +1,2 @@
+LOAD CSV WITH HEADERS FROM 'file:///users.csv' AS row
+             MERGE (p:Person {Id: row.ID, Name: row.Name, Surname: row.Surname, DateOfBirth: date(row.DateOfBirth), HomeLocationId: row.HomeLocationId});

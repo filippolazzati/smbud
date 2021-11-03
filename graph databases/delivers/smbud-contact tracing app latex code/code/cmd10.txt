@@ -1,0 +1,2 @@
+LOAD CSV WITH HEADERS FROM 'file:///vaccines.csv' AS row
+MERGE (v:VaccineDose {PersonId: row.PersonId, Date: datetime({epochSeconds: toInteger(row.Date)}), Type: row.Type});

@@ -1,0 +1,2 @@
+LOAD CSV WITH HEADERS FROM 'file:///devices.csv' AS row
+MERGE (d:Device {PersonId: row.PersonId, Name: row.Name})

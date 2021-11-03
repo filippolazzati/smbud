@@ -1,0 +1,1 @@
+match(p:Person)-[:TAKES]->(t1:Test), (p)-[:TAKES]->(t2:Test) where t1<>t2 and t1='positive' and t2='negative' and t1.Time < t2.Time return p

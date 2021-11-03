@@ -1,0 +1,6 @@
+match
+(p:Person)-[:TAKES]->(t:Test) 
+where 
+t.Time > (date()-duration('P2D'))
+and t.Result = 'negative' 
+return p

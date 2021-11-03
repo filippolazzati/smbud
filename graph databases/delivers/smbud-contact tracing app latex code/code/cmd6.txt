@@ -1,0 +1,5 @@
+MATCH
+  (p:Person),
+  (d:Device)
+WHERE d.PersonId=p.Id
+CREATE (p)-[r:OWNS]->(d)

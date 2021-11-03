@@ -1,0 +1,2 @@
+LOAD CSV WITH HEADERS FROM 'file:///test.csv' AS row
+MERGE (t:Test {PersonId: row.PersonId, Time: datetime({epochSeconds: toInteger(row.Time)}), Result: row.Result});

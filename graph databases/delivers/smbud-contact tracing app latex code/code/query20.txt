@@ -1,0 +1,2 @@
+match (p:Person)-[:GETS]->(v:VaccineDose)
+return p

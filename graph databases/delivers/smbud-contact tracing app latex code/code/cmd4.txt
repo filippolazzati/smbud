@@ -1,0 +1,4 @@
+LOAD CSV WITH HEADERS FROM 'file:///userlocations.csv' AS row
+MATCH (p: Person), (l: Location)
+WHERE p.Id=row.PersonId AND l.Id=row.LocationId
+CREATE (p)-[:VISITED {StartTime: datetime({epochSeconds: toInteger(row.StartTime)}), EndTime: datetime({epochSeconds: toInteger(row.EndTime)})}]->(l);
