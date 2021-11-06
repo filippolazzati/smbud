@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import axios from 'axios';
+import { withRouter } from "react-router";
 
-export default class PersonSearchBar extends Component {
+class PersonSearchBar extends Component {
     constructor(props){
         super(props);
 
@@ -19,35 +20,53 @@ export default class PersonSearchBar extends Component {
         });
     }
 
+    capitalizeFirstLetter(string) {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+
+    buildName(personName){
+        let builtName = "";
+        personName.forEach((word) => {
+            builtName = builtName + this.capitalizeFirstLetter(word.toLowerCase()) + "_";
+        });
+        return builtName.slice(0,builtName.length-1);
+    }
+
     onSubmit(e){
         e.preventDefault();
 
-        const personName = this.state.personName;
+        let personName = this.state.personName.split(" ");
 
         axios
-            .get('http://localhost:5000/users/getByName/' + personName)
-            .then((res) => console.log(res.data));
+            .get('http://localhost:5000/users/getByName/' + this.buildName(personName))
+            .then((res) => {
+                if(res.data.users.length > 0){
+                    this.props.history.push("/user/" + res.data.users[0].Id);
+                }
+            });
     }
 
     render(){
         return (
             <div>
                 <h2>Search a person</h2>
-                <form class="row g-2" onSubmit={this.onSubmit}>
-                    <div class="col-8">
+                <form className="row g-2" onSubmit={this.onSubmit}>
+                    <div className="col-8">
                         <input 
                             type="text" 
-                            class="form-control" 
+                            className="form-control" 
                             placeholder="Name and Surname" 
                             value={this.state.personName}
                             onChange={this.onChangePersonName}
                         />                    
                     </div>
-                    <div class="col-1">
-                        <button type="submit" class="btn btn-outline-success mb-3">Search</button>
+                    <div className="col-1">
+                        <button type="submit" className="btn btn-outline-success mb-3">Search</button>
                     </div>
                 </form>
             </div>
         );
     }
 }
+
+export default withRouter(PersonSearchBar);

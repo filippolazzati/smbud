@@ -33,18 +33,18 @@ export default class LocationSearchBar extends Component {
         return (
             <div>
                 <h2>Search a location</h2>
-                <form class="row g-2" onSubmit={this.onSubmit}>
-                    <div class="col-8">
+                <form className="row g-2" onSubmit={this.onSubmit}>
+                    <div className="col-8">
                         <input 
                             type="text" 
-                            class="form-control" 
+                            className="form-control" 
                             placeholder="Location name" 
                             value={this.state.locationName}
                             onChange={this.onChangeLocationName}
                         />                    
                     </div>
-                    <div class="col-1">
-                        <button type="submit" class="btn btn-outline-success mb-3">Search</button>
+                    <div className="col-1">
+                        <button type="submit" className="btn btn-outline-success mb-3">Search</button>
                     </div>
                 </form>
             </div>

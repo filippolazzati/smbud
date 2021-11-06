@@ -1,45 +1,102 @@
 import axios from "axios";
 import React, { Component } from "react";
 
+const Vaccine = (props) => (
+    <li className="list-group-item"><b>{props.type}</b> - {props.date}</li>
+);
+
+const EditDateButton = (props) => (
+    <button type="button" className="btn btn-outline-warning btn-sm float-end">Edit date</button>
+);
+
+const Test = (props) => (
+    <li className="list-group-item">{props.date} - {props.result} 
+        { props.result === "unknown" ? <EditDateButton /> : null }
+    </li>
+);
+
+
+
 export default class UserInfo extends Component{
     constructor(props){
         super(props);
         this.state = {
-            user_id: "",
-            user_name: "",
-            user_surname: "",
-            user_dateOfBirth: "",
-            user_homeId: "",
+            user_info: {},
+            user_vaccines: [],
+            user_tests:[],
         }
     }
 
     componentDidMount(){
-        axios.get("http://localhost:5000/users/get/" + this.props.id)
+        axios.get("http://localhost:5000/users/getById/" + this.props.id)
             .then((res) => {
                 this.setState({
-                    user_id: res.data.Id,
-                    user_name: res.data.Name,
-                    user_surname: res.data.Surname,
-                    user_homeId: res.data.HomeLocationId,
-                    user_dateOfBirth: res.data.DateOfBirth
+                    user_info: res.data.user[0],
+                    user_vaccines: res.data.vaccines,
+                    user_tests: res.data.tests,
                 });
-                console.log(this.state);
             })
             .catch((err) => console.log(err));
     }
 
+    buildDate(date){
+        return new Date(
+            date.year.low,
+            date.month.low,
+            date.day.low,
+            date.hour.low,
+            date.minute.low,
+            date.second.low
+        );
+    }
+
+    vaccineList(){
+        return this.state.user_vaccines.map((vaccine) => {
+            return <Vaccine key={this.buildDate(vaccine.Date).toISOString()} type={vaccine.Type} date={this.buildDate(vaccine.Date).toDateString()} />
+        })
+    }
+
+    testList(){
+        return this.state.user_tests.map((test) => {
+            return <Test key={this.buildDate(test.Time).toISOString()} result={test.Result} date={this.buildDate(test.Time).toDateString()} />
+        })
+    }
+
     render(){
         return(
-            <div className="card">
-                <div class="card-header">
-                    General Informations
+            <div className="row">
+                <div className="col">
+                    <div className="card">
+                        <div className="card-header">
+                            General Informations
+                        </div>
+                        <ul className="list-group list-group-flush">
+                            <li className="list-group-item"><b>Id: </b>{this.state.user_info.Id}</li>
+                            <li className="list-group-item"><b>Name: </b>{this.state.user_info.Name}</li>
+                            <li className="list-group-item"><b>Surname: </b>{this.state.user_info.Surname}</li>
+                            <li className="list-group-item"><b>Date of birth: </b>{this.state.user_info.DateOfBirth}</li>
+                        </ul>
+                    </div>
+                    <br />
+                    <div className="card">
+                        <div className="card-header">
+                            Vaccines
+                        </div>
+                        <ul className="list-group list-group-flush">
+                            {this.vaccineList()}
+                        </ul>
+                    </div>
                 </div>
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item"><b>Id: </b>{this.state.user_id}</li>
-                    <li class="list-group-item"><b>Name: </b>{this.state.user_name}</li>
-                    <li class="list-group-item"><b>Surname: </b>{this.state.user_surname}</li>
-                    <li class="list-group-item"><b>Date of birth: </b>{this.state.user_dateOfBirth}</li>
-                </ul>
+                <div className="col">
+                <div className="card">
+                        <div className="card-header">
+                            Tests
+                        </div>
+                        <ul className="list-group list-group-flush">
+                            {this.testList()}
+                        </ul>
+                    </div>
+                </div>
             </div>
         )
     }

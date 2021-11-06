@@ -33,7 +33,7 @@ export default class UserList extends Component {
 
     userList(){
         return this.state.users.map((user) => {
-            return <User id={user.Id} name={user.Name} surname={user.Surname}/>
+            return <User key={user.Id} id={user.Id} name={user.Name} surname={user.Surname}/>
         });
     }
 
