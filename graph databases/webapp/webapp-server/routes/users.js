@@ -24,6 +24,7 @@ usersRoutes.route("/get/:userId").get((req, res) => { //Get a user from id
         .run(`match (n:Person {Id: "${req.params.userId}"}) return n`)
         .then((result) => {
             res.json(result.records[0]._fields[0].properties);
+            //res.json(result);
         })
         .catch((err) => {
             res.json({errorMsg: err});
