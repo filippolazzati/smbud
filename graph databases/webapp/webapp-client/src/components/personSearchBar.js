@@ -41,7 +41,7 @@ class PersonSearchBar extends Component {
             .get('http://localhost:5000/users/getByName/' + this.buildName(personName))
             .then((res) => {
                 if(res.data.users.length > 0){
-                    this.props.history.push("/user/" + res.data.users[0].Id);
+                    this.props.history.push("/user/" + res.data.users[0].id);
                 }
             });
     }

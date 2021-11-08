@@ -3,7 +3,7 @@ import React, { Component } from "react";
 import { Link } from "react-router-dom";
 
 const Vaccine = (props) => (
-    <li className="list-group-item"><b>{props.type}</b> - {props.date}</li>
+    <li className="list-group-item">{props.date} - <b>{props.type}</b></li>
 );
 
 const EditDateButton = (props) => (
@@ -13,7 +13,7 @@ const EditDateButton = (props) => (
 );
 
 const Test = (props) => (
-    <li className="list-group-item">{props.date} - {props.result} 
+    <li className="list-group-item">{props.date} - <b>{props.result}</b>
         { props.result === "unknown" ? 
             <EditDateButton
                 userId={props.userId}
@@ -27,11 +27,10 @@ export default class UserInfo extends Component{
     constructor(props){
         super(props);
         this.state = {
-            user_info: {},
+            user_id: null,
+            user_properties: {},
             user_vaccines: [],
             user_tests:[],
-            modal_show: false,
-            modal_setShow: false,
         }
     }
 
@@ -39,7 +38,8 @@ export default class UserInfo extends Component{
         axios.get("http://localhost:5000/users/getById/" + this.props.id)
             .then((res) => {
                 this.setState({
-                    user_info: res.data.user[0],
+                    user_id: res.data.user[0].id,
+                    user_properties: res.data.user[0].properties,
                     user_vaccines: res.data.vaccines,
                     user_tests: res.data.tests,
                 });
@@ -68,11 +68,11 @@ export default class UserInfo extends Component{
         return this.state.user_tests.map((test) => {
             return (
                 <Test 
-                    key={this.buildDate(test.Time).toISOString()} 
-                    result={test.Result} 
-                    userId={this.state.user_info.Id} 
-                    date={this.buildDate(test.Time).toDateString()} 
-                    isoDate={this.buildDate(test.Time).toISOString()}
+                    key={test.id} 
+                    result={test.properties.Result} 
+                    userId={this.state.user_id} 
+                    date={this.buildDate(test.properties.Time).toDateString()} 
+                    isoDate={this.buildDate(test.properties.Time).toISOString()}
                 />
             )
         })
@@ -88,10 +88,10 @@ export default class UserInfo extends Component{
                                 General Informations
                             </div>
                             <ul className="list-group list-group-flush">
-                                <li className="list-group-item"><b>Id: </b>{this.state.user_info.Id}</li>
-                                <li className="list-group-item"><b>Name: </b>{this.state.user_info.Name}</li>
-                                <li className="list-group-item"><b>Surname: </b>{this.state.user_info.Surname}</li>
-                                <li className="list-group-item"><b>Date of birth: </b>{this.state.user_info.DateOfBirth}</li>
+                                <li className="list-group-item"><b>Id: </b>{this.state.user_id}</li>
+                                <li className="list-group-item"><b>Name: </b>{this.state.user_properties.Name}</li>
+                                <li className="list-group-item"><b>Surname: </b>{this.state.user_properties.Surname}</li>
+                                <li className="list-group-item"><b>Date of birth: </b>{this.state.user_properties.DateOfBirth}</li>
                             </ul>
                         </div>
                         <br />

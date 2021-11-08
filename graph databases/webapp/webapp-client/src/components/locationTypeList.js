@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 const Location = (props) => (
   <tr>
-    <td>{props.type}</td>
+    <td>{props.type + "s"}</td>
     <td>
       <Link to={"/location/type/" + props.type}>View</Link>
     </td>

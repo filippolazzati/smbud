@@ -21,8 +21,8 @@ export default class BookTest extends Component{
         axios.get("http://localhost:5000/users/get/" + this.state.userId)
             .then((res) => {
                 this.setState({
-                    userName: res.data.Name,
-                    userSurname: res.data.Surname,
+                    userName: res.data.properties.Name,
+                    userSurname: res.data.properties.Surname,
                 });
             })
             .catch((err) => console.log(err));

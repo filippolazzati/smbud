@@ -63,6 +63,33 @@ locationRoutes.route("/getLocationByAddress/:address").get((req, res) => {
     });
 });
 
+locationRoutes.route("/getLocationById/:id").get((req, res) => {
+  var location = {};
+
+  dbsession
+    .run(`match (l:Location) where id(l)=${req.params.id} return l`)
+    .subscribe({
+      onNext: (record) => {
+        location = {
+          id: record.get("l").identity.low,
+          address: record.get("l").properties.Address,
+          description: record.get("l").properties.Description,
+        };
+      },
+      onCompleted: function () {
+        console.log("Operation completed!");
+
+        //send the response
+        res.json({
+          location: location,
+        });
+      },
+      onError: function (error) {
+        console.log("Error occurred: " + error);
+      },
+    });
+});
+
 //get all types of location in DB
 locationRoutes.route("/getDescriptions/").get((req, res) => {
   var descriptions = [];
