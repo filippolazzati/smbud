@@ -1,0 +1,30 @@
+MATCH (a: Person)
+MATCH (p: Person)
+WHERE id(a)<>id(p) AND id(a)='xxx' AND (
+    EXISTS {
+        MATCH (a)-[c:CONTACT]-(p)
+        WHERE c.EndTime > (date()-duration('P5D'))
+    }
+    OR
+    EXISTS { MATCH (a)-[:LIVES_IN]->()<-[:LIVES_IN]-(p) }
+    OR
+    EXISTS {
+        MATCH (a)-[v1:VISITED]->()<-[v2:VISITED]-(p)
+        WHERE v1.EndTime > v2.StartTime and v2.EndTime > v1.StartTime and v1.EndTime > (date()-duration('P5D'))
+    }
+)
+MATCH (r: Person)
+WHERE id(a)<>id(r) AND (
+    EXISTS {
+        MATCH (p)-[c:CONTACT]-(r)
+        WHERE c.EndTime > (date()-duration('P5D'))
+    }
+    OR
+    EXISTS { MATCH (p)-[:LIVES_IN]->()<-[:LIVES_IN]-(r) }
+    OR
+    EXISTS {
+        MATCH (p)-[v1:VISITED]->()<-[v2:VISITED]-(r)
+        WHERE v1.EndTime > v2.StartTime and v2.EndTime > v1.StartTime and v1.EndTime > (date()-duration('P5D'))
+    }
+)
+RETURN r

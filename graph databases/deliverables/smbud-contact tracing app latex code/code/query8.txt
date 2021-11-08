@@ -1,0 +1,2 @@
+match (l:Location) 
+return distinct l.Description

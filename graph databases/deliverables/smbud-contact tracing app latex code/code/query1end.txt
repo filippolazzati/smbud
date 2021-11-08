@@ -1,8 +1,8 @@
 match
-(p:Person{Id:'xxx'})-[v1:VISITED]->(l1:Location)<-[v2:VISITED]-(q:Person), 
+(p:Person)-[v1:VISITED]->(l1:Location)<-[v2:VISITED]-(q:Person), 
 (q:Person)-[v3:VISITED]->(l2:Location)<-[v4:VISITED]-(r:Person)
 where
- p<>q and p<>r and q<>r
+ p<>q and p<>r and q<>r and id(p)='xxx'
 and v1.EndTime > v2.StartTime
  and v2.EndTime > v1.StartTime
  and v1.EndTime > (date()-duration('P5D'))
@@ -12,19 +12,19 @@ and v3.EndTime > v4.StartTime
  return r 
 UNION
 match
-(p:Person{Id:'xxx'})-[v1:VISITED]->(l:Location)<-[v2:VISITED]-(q:Person),
+(p:Person)-[v1:VISITED]->(l:Location)<-[v2:VISITED]-(q:Person),
 (q)-[:LIVES_IN]->(:Location)<-[:LIVES_IN]-(r:Person)
 where
- p<>q and p<>r and q<>r
+ p<>q and p<>r and q<>r and id(p)='xxx'
 and v1.EndTime > v2.StartTime
  and v2.EndTime > v1.StartTime
  and v1.EndTime > (date()-duration('P5D'))
  return r
 UNION
-match (p:Person{Id:'xxx'})-[v1:VISITED]->(l:Location)<-[v2:VISITED]-(q:Person),
+match (p:Person)-[v1:VISITED]->(l:Location)<-[v2:VISITED]-(q:Person),
 (q)-[c:CONTACT]-(r:Person)
 where
- p<>q and p<>r and q<>r
+ p<>q and p<>r and q<>r and id(p)='xxx'
 and v1.EndTime > v2.StartTime
  and v2.EndTime > v1.StartTime
  and v1.EndTime > (date()-duration('P5D'))
@@ -34,28 +34,28 @@ and c.StartTime > v2.StartTime
  return r
 UNION
 match
-(p:Person{Id:'xxx'})-[:LIVES_IN]->(:Location)<-[:LIVES_IN]-(q:Person),
+(p:Person)-[:LIVES_IN]->(:Location)<-[:LIVES_IN]-(q:Person),
 (q:Person)-[v1:VISITED]->(:Location)<-[v2:VISITED]-(r:Person)
  where
- p<>q and p<>r and q<>r
+ p<>q and p<>r and q<>r and id(p)='xxx'
 and v1.EndTime > v2.StartTime
  and v2.EndTime > v1.StartTime
  and v1.EndTime > (date()-duration('P5D'))
 return r
 UNION
 match
-(p:Person{Id:'xxx'})-[:LIVES_IN]->(:Location)<-[:LIVES_IN]-(q:Person),
+(p:Person)-[:LIVES_IN]->(:Location)<-[:LIVES_IN]-(q:Person),
 (q)-[c:CONTACT]-(r:Person)
  where
- p<>q and p<>r and q<>r
+ p<>q and p<>r and q<>r and id(p)='xxx'
 and c.EndTime > (date()-duration('P5D'))
 return r
 UNION
 match
-(p:Person{Id:'xxx'}) -[c:CONTACT]- (q:Person),
+(p:Person) -[c:CONTACT]- (q:Person),
 (q:Person)-[v1:VISITED]->(:Location)<-[v2:VISITED]-(r:Person)
 where
- p <> q and p <> r and q <> r and
+ p <> q and p <> r and q <> r and id(p)='xxx' and
 c.EndTime > (date()-duration('P5D'))
 and v1.EndTime > v2.StartTime
  and v2.EndTime > v1.StartTime
@@ -65,9 +65,9 @@ and v2.StartTime > c.StartTime
 return r
 UNION
 match
-(p:Person{Id:'168'}) -[c:CONTACT]- (q:Person),
+(p:Person) -[c:CONTACT]- (q:Person),
 (q)-[:LIVES_IN]->(:Location)<-[:LIVES_IN]-(r:Person)
 where
- p <> q and p <> r and q <> r and
+ p <> q and p <> r and q <> r and id(p)='xxx' and 
 c.EndTime > (date()-duration('P5D'))
 return r

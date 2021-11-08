@@ -1,1 +1,0 @@
-match(v:VaccineDose)  return v.Type, count(*) as number_of_doses

@@ -1,0 +1,4 @@
+match
+(p:Person)-[:LIVES_IN]->(l:Location)<-[:LIVES_IN]-(q:Person)
+where p<>q and id(p)='xxx'
+return q
