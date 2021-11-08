@@ -23,17 +23,17 @@ export default class PersonContacts extends Component {
 
     componentDidMount(){
         axios
-            .get('http://localhost:5000/users/get/' + this.props.match.params.id)//TODO
+            .get('http://localhost:5000/users/get/' + this.props.match.params.id)
             .then((res1) => {
                 this.setState({
                     userName: res1.data.Name,
                     userSurname: res1.data.Surname,
                 });
                 axios
-                    .get('http://localhost:5000/users/test')//TODO
+                    .get('http://localhost:5000/users/getContacts/' + this.props.match.params.id)
                     .then((res2) => {
                         this.setState({
-                            users: res2.data.users,
+                            users: res2.data.contacts,
                         });
                     })
                     .catch((err) => console.log(err));

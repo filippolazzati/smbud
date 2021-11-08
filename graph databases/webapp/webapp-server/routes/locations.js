@@ -59,21 +59,17 @@ locationRoutes.route("/getLocationByAddress/:address").get((req, res) => {
 locationRoutes.route("/getDescriptions/").get((req, res) => {
   var descriptions = [];
 
-  dbsession.run(`match (l:Location) return distinct l.Description`).subscribe({
-    onNext: (record) => {
-      descriptions.push(record.get("l.Description"));
-    },
-    onCompleted: function () {
-      console.log("Operation completed, all location's description loaded");
-
-      res.json({
-        description: descriptions,
+  dbsession.run("match (l:Location) return distinct l.Description")
+    .then((result) => {
+      result.records.forEach((record) => {
+        descriptions.push(record._fields[0]);
       });
-    },
-    onError: function (error) {
-      console.log("Error occurred: " + error);
-    },
-  });
+      res.json({descriptions: descriptions});
+    })
+    .catch((err) => {
+      res.json({ errorMsg: err });
+      console.log(err);
+    });
 });
 
 //get all people in a location

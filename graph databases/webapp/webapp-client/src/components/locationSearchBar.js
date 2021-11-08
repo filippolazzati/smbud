@@ -38,7 +38,7 @@ export default class LocationSearchBar extends Component {
                         <input 
                             type="text" 
                             className="form-control" 
-                            placeholder="Location name" 
+                            placeholder="Location address" 
                             value={this.state.locationName}
                             onChange={this.onChangeLocationName}
                         />                    

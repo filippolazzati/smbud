@@ -10,6 +10,9 @@ import EditTestDate from "./components/editTestDate";
 import BookTest from "./components/bookTest";
 import PersonContacts from "./components/personContacts";
 import VaccineStats from "./components/vaccineStats";
+import PersonPage from "./components/personPage";
+import LocationPage from "./components/locationPage";
+import LocationsOfType from "./components/locationsOfType";
 
 
 const App = () => {
@@ -20,6 +23,9 @@ const App = () => {
             <div className="container">
                 <Route exact path="/" component={Homepage} />
                 <Route exact path="/vaccines" component={VaccineStats} />
+                <Route exact path="/users" component={PersonPage} />
+                <Route exact path="/locations" component={LocationPage} />
+                <Route exact path="/location/type/:type" component={LocationsOfType} />
                 <Route exact path="/user/:id" component={UserPage} />
                 <Route exact path="/user/:id/booktest" component={BookTest} />
                 <Route exact path="/user/:id/contacts" component={PersonContacts} />
