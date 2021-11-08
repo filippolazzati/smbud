@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import PersonSearchBar from "./personSearchBar";
 import LocationSearchBar from "./locationSearchBar";
 import UserList from "./userList";
+import LocationTypeList from "./locationTypeList";
 
 
 export default class Homepage extends Component{
@@ -15,6 +16,8 @@ export default class Homepage extends Component{
                 </div>
                 <div className="col">
                     <LocationSearchBar />
+                    <hr />
+                    <LocationTypeList />
                 </div>
             </div>
         )
