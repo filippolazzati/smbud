@@ -1,5 +1,5 @@
 # smbud
-This is the repository for the projects of the *Systems and Methods for Big and Unstructured Data* (SMBUD). The repo is divided in 3 different parts, according to the different projects.
+This is the repository for the projects of the *Systems and Methods for Big and Unstructured Data* (SMBUD) course. The repo is divided in 3 different parts, according to the different projects.
 
 ## Graph databases
 The first directory is about the implementation of a simple contact tracing app using [Neo4J](https://neo4j.com/). 
