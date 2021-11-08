@@ -48,3 +48,22 @@ CREATE (p)-[r:TAKES]->(t);
 MATCH (v:VaccineDose), (p:Person)
 WHERE v.PersonId=p.Id
 CREATE (p)-[r:GETS]->(v);
+
+//Remove the HomeLocationId and Id in Person and the PersonId in the other nodes
+MATCH(p:Person)
+REMOVE p.HomeLocationId;
+
+MATCH(t:Test)
+REMOVE t.PersonId;
+
+MATCH(v:VaccineDose)
+REMOVE v.PersonId;
+
+MATCH(d:Device)
+REMOVE d.PersonId;
+
+MATCH(p:Person)
+REMOVE p.Id;
+
+MATCH(l:Location)
+REMOVE l.Id;

@@ -1,0 +1,3 @@
+match(p:Person)
+where id(p)='xxx'
+create (t:Test{Result:"Unknown", Time:date("year-month-day")})<-[:TAKES]-(p)

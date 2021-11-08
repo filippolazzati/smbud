@@ -1,0 +1,5 @@
+match
+(p:Person)-[v1:VISITED]->(l:Location)<-[v2:VISITED]-(q:Person)
+where
+p<>q and id(p)='xxx' and v1.EndTime > v2.StartTime and v2.EndTime > v1.StartTime and v1.EndTime > (date()-duration('P5D')) 
+return q

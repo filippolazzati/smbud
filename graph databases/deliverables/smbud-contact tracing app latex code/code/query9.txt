@@ -1,0 +1,3 @@
+match (l:Location)<-[v:VISITED]-(p:Person) 
+where id(l)=12 and v.StartTime.year = 2020 and v.StartTime.month = 3 and v.StartTime.day = 3
+return p

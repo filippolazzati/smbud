@@ -1,4 +1,0 @@
-match
-(p:Person{Id:'xxx'})-[:LIVES_IN]->(l:Location)<-[:LIVES_IN]-(q:Person)
-where p<>q 
-return q
