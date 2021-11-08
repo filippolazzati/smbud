@@ -34,7 +34,7 @@ export default class LocationsOfType extends Component {
 
     locationList(){
         return this.state.locations.map((location) => {
-            return <Location key={location.Id} id={location.Id} address={location.Address}/>
+            return <Location key={location.id} id={location.id} address={location.address}/>
         });
     }
 

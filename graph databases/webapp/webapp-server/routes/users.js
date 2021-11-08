@@ -10,7 +10,10 @@ usersRoutes.route("/test").get((req, res) => {
     .then((result) => {
       let userArr = [];
       result.records.forEach((record) => {
-        userArr.push(record._fields[0].properties);
+        userArr.push({
+          id: record._fields[0].identity.low,
+          properties: record._fields[0].properties
+        });
       });
       res.json({ users: userArr });
     })
@@ -158,7 +161,10 @@ RETURN p`
     )
     .subscribe({
       onNext: (record) => {
-        contacts.push(record.get("p").properties);
+        contacts.push({
+          id: record.get("p").identity.low,
+          properties: record.get("p").properties
+        });
       },
       onCompleted: function () {
         console.log("Find all contacts of a person last 5 days");

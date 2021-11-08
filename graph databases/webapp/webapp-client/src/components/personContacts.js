@@ -26,8 +26,8 @@ export default class PersonContacts extends Component {
             .get('http://localhost:5000/users/get/' + this.props.match.params.id)
             .then((res1) => {
                 this.setState({
-                    userName: res1.data.Name,
-                    userSurname: res1.data.Surname,
+                    userName: res1.data.properties.Name,
+                    userSurname: res1.data.properties.Surname,
                 });
                 axios
                     .get('http://localhost:5000/users/getContacts/' + this.props.match.params.id)
@@ -43,7 +43,7 @@ export default class PersonContacts extends Component {
 
     userList(){
         return this.state.users.map((user) => {
-            return <User key={user.Id} id={user.Id} name={user.Name} surname={user.Surname}/>
+            return <User key={user.id} id={user.id} name={user.properties.Name} surname={user.properties.Surname}/>
         });
     }
 
