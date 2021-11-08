@@ -124,4 +124,41 @@ usersRoutes.route("/get/:userId").get((req, res) => {
     });
 });
 
+//get all contacts of a person in the last 5 days
+usersRoutes.route("/getContacts/:userId").get((req, res) => {
+  var contacts = [];
+
+  dbsession
+    .run(
+      `MATCH (a: Person)
+MATCH (p: Person)
+WHERE id(a)<>id(p) AND id(a)= ${req.params.userId} AND (
+EXISTS {
+MATCH (a)-[c:CONTACT]-(p)
+WHERE c.EndTime > (date()-duration('P5D')) }
+OR
+EXISTS { MATCH (a)-[:LIVES_IN]->()<-[:LIVES_IN]-(p) }
+OR EXISTS {
+MATCH (a)-[v1:VISITED]->()<-[v2:VISITED]-(p)
+WHERE v1.EndTime > v2.StartTime and v2.EndTime > v1. StartTime and v1.EndTime > (date()-duration('P5D'))
+} )
+RETURN p`
+    )
+    .subscribe({
+      onNext: (record) => {
+        contacts.push(record.get("p").properties);
+      },
+      onCompleted: function () {
+        console.log("Find all contacts of a person last 5 days");
+
+        res.json({
+          contacts: contacts,
+        });
+      },
+      onError: function (error) {
+        console.log("Error occurred: " + error);
+      },
+    });
+});
+
 module.exports = usersRoutes;
