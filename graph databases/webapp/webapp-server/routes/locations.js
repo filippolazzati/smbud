@@ -15,7 +15,11 @@ locationRoutes
       )
       .subscribe({
         onNext: (record) => {
-          locationList.push(record.get("l").properties);
+          locationList.push({
+            id: record.get("l").identity.low,
+            address: record.get("l").properties.Address,
+            description: record.get("l").properties.Description,
+          });
         },
         onCompleted: function () {
           console.log("Operation completed!");
@@ -39,7 +43,11 @@ locationRoutes.route("/getLocationByAddress/:address").get((req, res) => {
     .run(`match (l:Location {Address: "${req.params.address}"}) return l`)
     .subscribe({
       onNext: (record) => {
-        location.push(record.get("l").properties);
+        location.push({
+          id: record.get("l").identity.low,
+          address: record.get("l").properties.Address,
+          description: record.get("l").properties.Description,
+        });
       },
       onCompleted: function () {
         console.log("Operation completed!");
@@ -59,12 +67,13 @@ locationRoutes.route("/getLocationByAddress/:address").get((req, res) => {
 locationRoutes.route("/getDescriptions/").get((req, res) => {
   var descriptions = [];
 
-  dbsession.run("match (l:Location) return distinct l.Description")
+  dbsession
+    .run("match (l:Location) return distinct l.Description")
     .then((result) => {
       result.records.forEach((record) => {
         descriptions.push(record._fields[0]);
       });
-      res.json({descriptions: descriptions});
+      res.json({ descriptions: descriptions });
     })
     .catch((err) => {
       res.json({ errorMsg: err });
@@ -90,7 +99,10 @@ month = ${month} and v.StartTime.day = ${day} return p`
     )
     .subscribe({
       onNext: (record) => {
-        visitors.push(record.get("p").properties);
+        visitors.push({
+          id: record.get("p").identity.low,
+          properties: record.get("p").properties,
+        });
       },
       onCompleted: function () {
         console.log("Find all visitors of a location in a specific date");

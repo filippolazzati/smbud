@@ -30,7 +30,10 @@ usersRoutes.route("/getByName/:userName").get((req, res) => {
     .then((result) => {
       var usersList = [];
       result.records.forEach((record) => {
-        usersList.push(record._fields[0].properties);
+        usersList.push({
+          id: record.get("n").identity.low,
+          properties: record._fields[0].properties,
+        });
       });
       res.json({ users: usersList });
     })
@@ -50,9 +53,12 @@ usersRoutes.route("/getById/:userId").get(async (req, res) => {
   //get basic info about an user from his Id
   var userInfo = [];
 
-  dbsession.run(`match (n:Person {Id: "${userId}"}) return n`).subscribe({
+  dbsession.run(`match (n:Person) where id(n)= ${userId} return n`).subscribe({
     onNext: (record1) => {
-      userInfo.push(record1.get("n").properties);
+      userInfo.push({
+        id: record1.get("n").identity.low,
+        properties: record1.get("n").properties,
+      });
     },
     onCompleted: function () {
       console.log("Operation 1 completed.");
@@ -62,7 +68,7 @@ usersRoutes.route("/getById/:userId").get(async (req, res) => {
 
       dbsession
         .run(
-          `match (n:Person {Id: "${userId}"})-[:GETS]->(v:VaccineDose) RETURN v`
+          `match (n:Person)-[:GETS]->(v:VaccineDose) where id(n)= ${userId} RETURN v`
         )
         .subscribe({
           onNext: (record2) => {
@@ -76,11 +82,14 @@ usersRoutes.route("/getById/:userId").get(async (req, res) => {
 
             dbsession
               .run(
-                `match (n:Person {Id: "${userId}"})-[:TAKES]->(t:Test) RETURN t`
+                `match (n:Person)-[:TAKES]->(t:Test) where id(n)= ${userId} RETURN t`
               )
               .subscribe({
                 onNext: (record3) => {
-                  testList.push(record3.get("t").properties);
+                  testList.push({
+                    id: record3.get("t").identity.low,
+                    properties: record3.get("t").properties,
+                  });
                 },
                 onCompleted: function () {
                   console.log("Operation 3 completed.");
@@ -114,9 +123,12 @@ usersRoutes.route("/getById/:userId").get(async (req, res) => {
 usersRoutes.route("/get/:userId").get((req, res) => {
   //Get a user from id
   dbsession
-    .run(`match (n:Person {Id: "${req.params.userId}"}) return n`)
+    .run(`match (n:Person) where id(n)= ${req.params.userId} return n`)
     .then((result) => {
-      res.json(result.records[0]._fields[0].properties);
+      res.json({
+        id: result.records[0]._fields[0].identity.low,
+        properties: result.records[0]._fields[0].properties,
+      });
     })
     .catch((err) => {
       res.json({ errorMsg: err });
