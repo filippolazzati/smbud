@@ -64,4 +64,20 @@ WHERE id(t)=${req.params.testId} RETURN n`
     });
 });
 
+//when the result of a test is ready, change it
+testsRoutes.route("/saveResult").post((req, res) => {
+  dbsession
+    .run(
+      `MATCH (t:Test)
+WHERE id(t)=${req.body.testId} and t.Result ='unknown' SET t.Result='${req.body.result}'`
+    )
+    .then(() => {
+      //the post went succesfully
+      res.status(200).json("OK");
+    })
+    .catch((err) => {
+      res.status(500).json({ errorMsg: err });
+    });
+});
+
 module.exports = testsRoutes;
