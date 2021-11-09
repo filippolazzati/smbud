@@ -7,17 +7,16 @@ const Vaccine = (props) => (
 );
 
 const EditDateButton = (props) => (
-    <Link to={"/user/" + props.userId + "/editTest/" + props.testDate}>
+    <Link to={"/test/" + props.id + "/editDate"}>
         <button type="button" className="btn btn-outline-warning btn-sm float-end">Edit date</button>
     </Link>
 );
 
 const Test = (props) => (
-    <li className="list-group-item">{props.date} - <b>{props.result}</b>
-        { props.result === "unknown" ? 
+    <li className="list-group-item">{props.date} - <b>{props.result.toUpperCase()}</b>
+        { props.result.toUpperCase() === "UNKNOWN" ? 
             <EditDateButton
-                userId={props.userId}
-                testDate={props.isoDate}
+                id={props.testId}
             /> 
             : null }
     </li>
@@ -26,11 +25,14 @@ const Test = (props) => (
 export default class UserInfo extends Component{
     constructor(props){
         super(props);
+
         this.state = {
             user_id: null,
             user_properties: {},
             user_vaccines: [],
             user_tests:[],
+            editTestId: null,
+            editTestDate: new Date(),
         }
     }
 
@@ -69,6 +71,7 @@ export default class UserInfo extends Component{
             return (
                 <Test 
                     key={test.id} 
+                    testId={test.id}
                     result={test.properties.Result} 
                     userId={this.state.user_id} 
                     date={this.buildDate(test.properties.Time).toDateString()} 

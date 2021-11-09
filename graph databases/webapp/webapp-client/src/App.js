@@ -2,6 +2,7 @@ import React from "react";
 import { Route } from "react-router-dom";
 
 import "bootstrap/dist/css/bootstrap.css";
+import "bootstrap/dist/js/bootstrap.min.js";
 
 import Navbar from "./components/navbar";
 import Homepage from "./components/homepage";
@@ -31,7 +32,7 @@ const App = () => {
                 <Route exact path="/user/:id" component={UserPage} />
                 <Route exact path="/user/:id/booktest" component={BookTest} />
                 <Route exact path="/user/:id/contacts" component={PersonContacts} />
-                <Route exact path="/user/:id/editTest/:testDate" component={EditTestDate} />
+                <Route exact path="/test/:id/editDate" component={EditTestDate} />
             </div>
         </div>
     );

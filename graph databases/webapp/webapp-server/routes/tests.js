@@ -50,6 +50,7 @@ WHERE id(t)=${req.params.testId} RETURN n`
     .subscribe({
       onNext: (record) => {
         tested.push({
+          id: record.get("n").identity.low,
           properties: record.get("n").properties,
         });
       },
