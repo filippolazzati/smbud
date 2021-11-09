@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
+import ResultButtons from "./resultButtons";
 
 const Vaccine = (props) => (
     <li className="list-group-item">{props.date} - <b>{props.type}</b></li>
@@ -15,9 +16,12 @@ const EditDateButton = (props) => (
 const Test = (props) => (
     <li className="list-group-item">{props.date} - <b>{props.result.toUpperCase()}</b>
         { props.result.toUpperCase() === "UNKNOWN" ? 
-            <EditDateButton
-                id={props.testId}
-            /> 
+            <div>
+                <EditDateButton
+                    id={props.testId}
+                /> 
+                <ResultButtons id={props.testId} userId={props.userId}/>
+            </div>
             : null }
     </li>
 );
