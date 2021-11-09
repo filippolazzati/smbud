@@ -8,21 +8,23 @@ export default class EditTestDate extends Component{
         this.handleChangeName = this.handleChangeName.bind(this);
         this.handleChangeSurname = this.handleChangeSurname.bind(this);
         this.handleChangeDate = this.handleChangeDate.bind(this);
+        this.onSubmit = this.onSubmit.bind(this);
 
         this.state = {
-            userId: props.match.params.id,
-            testDate: props.match.params.testDate,
+            testId: this.props.match.params.id,
+            userId: null,
             userName: "",
             userSurname: "",
         }
     }
 
     componentDidMount(){
-        axios.get("http://localhost:5000/users/get/" + this.state.userId)
+        axios.get("http://localhost:5000/tests/whoTakes/" + this.state.testId)
             .then((res) => {
                 this.setState({
-                    userName: res.data.properties.Name,
-                    userSurname: res.data.properties.Surname,
+                    userId: res.data.user[0].id,
+                    userName: res.data.user[0].properties.Name,
+                    userSurname: res.data.user[0].properties.Surname,
                 });
             })
             .catch((err) => console.log(err));
@@ -48,7 +50,19 @@ export default class EditTestDate extends Component{
 
     onSubmit(e){
         e.preventDefault();
-        //TODO
+        
+        let tempDate = new Date(this.state.testDate);
+
+        const newTest = {
+            testId: this.state.testId,
+            date: tempDate.getFullYear() + "-" + tempDate.getMonth() + "-" + tempDate.getDate()
+        }
+
+        axios
+            .post("http://localhost:5000/tests/changeTest", newTest)
+            .then((res) => 
+                this.props.history.push("/user/" + this.state.userId)
+            );
     }
 
     render(){

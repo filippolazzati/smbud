@@ -8,9 +8,10 @@ export default class BookTest extends Component{
         this.handleChangeName = this.handleChangeName.bind(this);
         this.handleChangeSurname = this.handleChangeSurname.bind(this);
         this.handleChangeDate = this.handleChangeDate.bind(this);
+        this.onSubmit = this.onSubmit.bind(this);
 
         this.state = {
-            userId: props.match.params.id,
+            userId: null,
             userName: "",
             userSurname: "",
             testDate: "",
@@ -18,9 +19,10 @@ export default class BookTest extends Component{
     }
 
     componentDidMount(){
-        axios.get("http://localhost:5000/users/get/" + this.state.userId)
+        axios.get("http://localhost:5000/users/get/" + this.props.match.params.id)
             .then((res) => {
                 this.setState({
+                    userId: res.data.id,
                     userName: res.data.properties.Name,
                     userSurname: res.data.properties.Surname,
                 });
@@ -48,7 +50,19 @@ export default class BookTest extends Component{
 
     onSubmit(e){
         e.preventDefault();
-        //TODO
+
+        let tempDate = new Date(this.state.testDate);
+
+        const newTest = {
+            userId: this.state.userId,
+            date: tempDate.getFullYear() + "-" + tempDate.getMonth() + "-" + tempDate.getDate()
+        }
+
+        axios
+            .post("http://localhost:5000/tests/newTest", newTest)
+            .then((res) => 
+                this.props.history.push("/user/" + this.state.userId)
+            );
     }
 
     render(){
