@@ -9,7 +9,7 @@ testsRoutes.route("/newTest/").post((req, res) => {
     .run(
       `match(p:Person)
 where id(p)=${req.body.userId}
-create (t:Test{Result:"Unknown", Time:datetime("${req.body.date}T18:40:32.142+0100")})
+create (t:Test{Result:"unknown", Time:datetime("${req.body.date}T18:40:32.142+0100")})
 <-[:TAKES]-(p)`
     )
     .then(() => {
@@ -26,7 +26,7 @@ testsRoutes.route("/changeTest").post((req, res) => {
   dbsession
     .run(
       `MATCH (t:Test)
-WHERE id(t)=${req.body.testId} 
+WHERE id(t)=${req.body.testId}
 SET t.Time=datetime("${req.body.date}T18:40:32.142+0100")`
     )
     .then(() => {
@@ -35,6 +35,32 @@ SET t.Time=datetime("${req.body.date}T18:40:32.142+0100")`
     })
     .catch((err) => {
       res.status(500).json({ errorMsg: err });
+    });
+});
+
+//get the person who takes a test by its Id
+testsRoutes.route("/whoTakes/:testId").get((req, res) => {
+  var tested = [];
+
+  dbsession
+    .run(
+      `MATCH (t:Test)<-[:TAKES]-(n:Person)
+WHERE id(t)=${req.params.testId} RETURN n`
+    )
+    .subscribe({
+      onNext: (record) => {
+        tested.push({
+          properties: record.get("n").properties,
+        });
+      },
+      onCompleted: function () {
+        res.json({
+          user: tested,
+        });
+      },
+      onError: function (error) {
+        console.log("Error occurred: " + error);
+      },
     });
 });
 
