@@ -9,7 +9,7 @@ testsRoutes.route("/newTest/").post((req, res) => {
     .run(
       `match(p:Person)
 where id(p)=${req.body.userId}
-create (t:Test{Result:"Unknown", Time:date("${req.body.date}")})
+create (t:Test{Result:"Unknown", Time:datetime("${req.body.date}T18:40:32.142+0100")})
 <-[:TAKES]-(p)`
     )
     .then(() => {
@@ -25,8 +25,8 @@ create (t:Test{Result:"Unknown", Time:date("${req.body.date}")})
 testsRoutes.route("/changeTest").post((req, res) => {
   dbsession
     .run(
-      `MATCH (p:Person)-[takes:TAKES]->(t:Test)
-WHERE id(p)=${req.body.userId} and t.Result = "Unknown"
+      `MATCH (t:Test)
+WHERE id(t)=${req.body.testId} 
 SET t.Time=datetime("${req.body.date}T18:40:32.142+0100")`
     )
     .then(() => {
