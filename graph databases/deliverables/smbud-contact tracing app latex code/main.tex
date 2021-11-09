@@ -85,6 +85,7 @@ The database is implemented under the following hypothesis:
 \item if a person has a contact with a positive individual, he/she is notified to take a test: if the test results positive, his/her contacts are traced and notified too;
 \item individuals who tested positive must take a test (booked by the system) 10 days after the first one. If it is negative they can end their isolation (recovered);
 \item a test can be moved to another day;
+\item a person cannot have more than one test booked at the same time (at most one) with 'Unknown' result;
 \item people in isolation cannot go to other places but their house (for people with more houses, only 1 house is allowed);
 \item the vaccine campaign has already started:
 \begin{description}
@@ -181,7 +182,7 @@ We have identified the following \verb |INSERT| commands to show how the system 
     \lstinputlisting[language=SQL]{code/command1.txt}
     \item \textbf{book a test for a person}.\\As it is specified in the assumptions, to book a test in our system a new \textit{Test} node has to be created with 'Unknown' \textit{Result}:
     \lstinputlisting[language=SQL]{code/command3.txt}
-    \item \textbf{insert the result of a test}. \\We use the \verb|SET| construct to change the \textit{Result} attribute of the test:
+    \item \textbf{insert the result of a test}. \\We use the \verb|SET| construct to change the \textit{Result} attribute of the test (according to the assumptions, no person can have more than one test with 'Unknown' \textit{Result} at the same time):
     \lstinputlisting[language=SQL]{code/command4.txt}
     \item \textbf{modify the date of a test}. \\We use the \verb|SET| construct to change the \textit{Time} attribute of the test:
     \lstinputlisting[language=SQL]{code/command2.txt}

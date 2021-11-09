@@ -1,3 +1,3 @@
 match(p:Person)
 where id(p)='xxx'
-create (t:Test{Result:"Unknown", Time:date("year-month-day")})<-[:TAKES]-(p)
+create (t:Test{Result:"Unknown", Time:datetime("2019-06-01T18:40:32.142+0100")})<-[:TAKES]-(p)
