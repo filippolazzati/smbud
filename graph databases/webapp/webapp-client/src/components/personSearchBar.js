@@ -2,6 +2,12 @@ import React, { Component } from "react";
 import axios from 'axios';
 import { withRouter } from "react-router";
 
+const Alert = () => (
+    <div className="alert alert-danger" role="alert">
+        Could not find the specified person!
+    </div>
+)
+
 class PersonSearchBar extends Component {
     constructor(props){
         super(props);
@@ -11,6 +17,7 @@ class PersonSearchBar extends Component {
 
         this.state = {
             personName: "",
+            alertVisibile: false,
         };
     }
 
@@ -42,6 +49,15 @@ class PersonSearchBar extends Component {
             .then((res) => {
                 if(res.data.users.length > 0){
                     this.props.history.push("/user/" + res.data.users[0].id);
+                } else {
+                    this.setState({
+                        alertVisibile: true,
+                    });
+                    setTimeout(() => {
+                        this.setState({
+                            alertVisibile: false,
+                        })
+                    }, 3000);
                 }
             });
     }
@@ -64,6 +80,7 @@ class PersonSearchBar extends Component {
                         <button type="submit" className="btn btn-outline-success mb-3">Search</button>
                     </div>
                 </form>
+                {this.state.alertVisibile ? <Alert /> : null}
             </div>
         );
     }
