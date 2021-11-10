@@ -1,3 +1,0 @@
-MATCH (p:Person)-[takes:TAKES]->(t:Test) 
-WHERE id(p)='xxx' and t.Result = 'Unknown' 
-SET t.Result='Positive'

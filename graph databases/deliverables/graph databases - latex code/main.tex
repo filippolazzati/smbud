@@ -2,6 +2,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage{listings}
 \usepackage{xcolor}
+\usepackage{subcaption}
 
 \definecolor{codegreen}{rgb}{0,0.6,0}
 \definecolor{codegray}{rgb}{0.5,0.5,0.5}
@@ -85,7 +86,6 @@ The database is implemented under the following hypothesis:
 \item if a person has a contact with a positive individual, he/she is notified to take a test: if the test results positive, his/her contacts are traced and notified too;
 \item individuals who tested positive must take a test (booked by the system) 10 days after the first one. If it is negative they can end their isolation (recovered);
 \item a test can be moved to another day;
-\item a person cannot have more than one test booked at the same time (at most one) with 'Unknown' result;
 \item people in isolation cannot go to other places but their house (for people with more houses, only 1 house is allowed);
 \item the vaccine campaign has already started:
 \begin{description}
@@ -120,7 +120,7 @@ Among these entities, some relations hold. In particular:
     \item \textit{VISITED} is used to store data about when a certain person was in a certain place (ex.: museum, ...) and at which time, in order to find other people in the same place at the same time.
 \end{itemize}
 \newpage
-\section{Sample dataset}
+\section{Sample dataset}\label{import dataset}
 A sample dataset has been provided along with a file to initialize it. Such sample dataset has been built using some data found through the \href{https://datasetsearch.research.google.com}{Google dataset research} website at \href{https://www.kaggle.com/aleanfigeno/contact-tracing-application-sample-datasets/tasks}{this link}.This sample data has been modified and customised using some \verb|PHP| scripts.\\ In order to import it into your \verb |NEO4J| database, you have to put the files contained in the \href{https://github.com/filippolazzati/smbud/tree/main/graph\%20databases/sample\%20dataset\%20and\%20code/import}{import folder} of the project into the \textit{import} folder of the database in Neo4J. Then you can copy and paste the content of the \href{https://github.com/filippolazzati/smbud/blob/main/graph\%20databases/sample\%20dataset\%20and\%20code/inizialize\%20sample\%20dataset.cql}{inizialize sample dataset.cql} file into the Neo4J browser.In the following there is an explanation of such file.\\ \\
 Since the sample dataset is given in \verb |CSV| files, you can exploit the \verb |LOAD| \verb |CSV| command to load the data (remember to put the files in the \verb |IMPORT| folder) :
 \begin{enumerate}
@@ -188,12 +188,111 @@ We have identified the following \verb |INSERT| commands to show how the system 
     \lstinputlisting[language=SQL]{code/command2.txt}
 \end{itemize}
 \section{User Interface}
+    \subsection{Description}
+    We have provided a demo of a User Interface in the \href{https://github.com/filippolazzati/smbud/tree/main/graph\%20databases/webapp}{webapp} folder in order to show some use cases of the database and how to apply some sample queries/commands to it. We have implemented a simple client-server application with some basic functionalities to query and update the database. The application is implemented in \verb|JavaScript|, using \textit{node.js} and \textit{express.js} to run the server and the \textbf{React} framework for the front-end.
+    \subsection{Functionalities}
+    The application allows to:
+    \begin{itemize}
+    \item search for a person in the database by his name and surname;
+    \item visualize information for a given person such as name, surname, date of birth, and COVID-19 tests and vaccines;
+    \item insert result of a booked test or edit the test date;
+    \item book a new test;
+    \item show a person's contacts in the last 5 days;
+    \item search for a location by its address or by selecting it from a list of locations of the same type;
+    \item visualize information for a given location and its visitors in a given date;
+    \item visualize basic vaccine distribution statistics.
+    \end{itemize}
 \section{User guide}
+\subsection{Requirements}
+In order to run the application, the following software need to be installed on your machine.
+\begin{itemize}
+    \item Java JDK 11.0
+    \item Neo4j Community Edition
+    \item Node.js
+\end{itemize}
+\subsection{Database}
+To run the database:
+\begin{itemize}
+    \item Open the Terminal;
+    \item Go to the installation folder of Neo4j Community;
+    \item Go to the bin folder;
+    \item Run ./neo4j console;
+    \item To use the Neo4j User Interface, open your browser and go to http://localhost:7474;
+    \item If you haven't already done it, import the dataset (see section \ref{import dataset}).
+\end{itemize}
+\subsection{Server}
+After having installed \textit{Node.js}, to run the server
+\begin{itemize}
+    \item Clone the github repository;
+    \item Inside the repository, go to \href{https://github.com/filippolazzati/smbud/tree/main/graph\%20databases/webapp/webapp-server}{graph databases/webapp/webapp-server};
+    \item Edit the config.env file with your Neo4j credentials;
+    \item To install the required node dependencies, use the command:
+    \begin{lstlisting}[language=bash]
+    npm install
+\end{lstlisting}
+    \item To run the server, run node index.js
+\end{itemize}
+\subsection{Client}
+After having started the server, to run the front-end of the application:
+\begin{itemize}
+    \item Inside the repository, go to \href{https://github.com/filippolazzati/smbud/tree/main/graph\%20databases/webapp/webapp-client}{/graph databases/webapp/webapp-client};
+    \item To install the required node dependencies, run: 
+    \begin{lstlisting}[language=bash]
+    npm install
+\end{lstlisting}
+    \item To run the UI, run:
+    \begin{lstlisting}[language=bash]
+    npm start
+\end{lstlisting} The browser should open automatically; in case it does not, then go to: \url{http://localhost:5000}
+\end{itemize}
 \section{References and sources}
 \begin{itemize}
     \item \href{https://datasetsearch.research.google.com}{Google Dataset Research}
     \item \href{https://www.kaggle.com/aleanfigeno/contact-tracing-application-sample-datasets/tasks}{Kaggle}
     \item \href{https://app.diagrams.net}{draw.io}
+    \item \href{https://nodejs.org}{node.js}
+    \item \href{https://expressjs.com}{express.js}
+    \item \href{https://reactjs.org/}{React}
+    \item \href{https://neo4j.com/}{Neo4J}
+    \item \href{https://www.oracle.com/it/java/technologies/javase/jdk11-archive-downloads.html}{Java JDK 11}
 \end{itemize}
+\section{Image gallery}
+    In this section we include some screenshots showing the appearance of the User Interface (UI). Read the captions for details about what each image represents.
+    
+    \begin{figure}[ht!]
+    \centering
+    \includegraphics[scale=0.3]{smbud-contact tracing app latex code/screenshots/locationlist.png}
+    \caption{User interface for visualizing all the restaurants in the database.}
+\end{figure}
 
+\begin{figure}[ht!]
+    \centering
+    \includegraphics[scale=0.3]{smbud-contact tracing app latex code/screenshots/locationoverview.png}
+    \caption{How the app shows the overview of a location.}
+\end{figure}
+\begin{figure}[ht!]
+    \centering
+    \includegraphics[scale=0.3]{smbud-contact tracing app latex code/screenshots/personcontacts.png}
+    \caption{The contacts of a certain person in the last 5 days.}
+\end{figure}
+\begin{figure}[ht!]
+    \centering
+    \includegraphics[scale=0.3]{smbud-contact tracing app latex code/screenshots/personoverview.png}
+    \caption{How the app shows the overview of a person.}
+\end{figure}
+\begin{figure}[ht!]
+    \centering
+    \includegraphics[scale=0.3]{smbud-contact tracing app latex code/screenshots/searchlocation.png}
+    \caption{Locations research by address.}
+\end{figure}
+\begin{figure}[ht!]
+    \centering
+    \includegraphics[scale=0.3]{smbud-contact tracing app latex code/screenshots/searchperson.png}
+    \caption{Persons research by name and surname.}
+\end{figure}
+\begin{figure}[ht!]
+    \centering
+    \includegraphics[scale=0.3]{smbud-contact tracing app latex code/screenshots/vaccines.png}
+    \caption{Some statistics about the distribution of vaccine doses.}
+\end{figure}
 \end{document}
