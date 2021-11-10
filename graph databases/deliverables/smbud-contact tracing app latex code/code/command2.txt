@@ -1,3 +1,0 @@
-MATCH (p:Person)-[takes:TAKES]->(t:Test) 
-WHERE id(p)='xxx' and t.Result = 'Unknown' 
-SET t.Time=datetime("2019-06-01T18:40:32.142+0100")
