@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 
 const Test = (props) => (
-    <li className="list-group-item">Type: {props.type} - Date: {props.date}</li>
+    <li className="list-group-item">Type: <b>{props.type}</b> - Date: <b>{props.date}</b></li>
 );
 
 export default class TestsList extends Component{
@@ -21,10 +21,10 @@ export default class TestsList extends Component{
 
     render(){
         return(
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Tests List</h5>
-                    <ul class="list-group list-group-flush">
+            <div className="card">
+                <div className="card-body">
+                    <h5 className="card-title">Tests List</h5>
+                    <ul className="list-group list-group-flush">
                         {this.testList()}
                     </ul>
                 </div>

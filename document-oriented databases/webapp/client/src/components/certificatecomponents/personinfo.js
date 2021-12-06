@@ -5,10 +5,7 @@ export default class PersonInfo extends Component{
         super(props);
 
         this.state = {
-            id: "ABC123",
-            name: "Mario",
-            surname: "Rossi",
-            dateOfBirth: "25/12/1969"
+            owner: this.props.owner,
         }
     }
 
@@ -18,10 +15,11 @@ export default class PersonInfo extends Component{
                 <div class="card-body">
                     <h5 class="card-title">Person info</h5>
                     <ul class="list-group list-group-flush">
-                        <li class="list-group-item">ID: {this.state.id}</li>
-                        <li class="list-group-item">Name: {this.state.name}</li>
-                        <li class="list-group-item">Surname: {this.state.surname}</li>
-                        <li class="list-group-item">Date of Birth: {this.state.dateOfBirth}</li>
+                        <li class="list-group-item">Name: <b>{this.state.owner.name}</b></li>
+                        <li class="list-group-item">Surname: <b>{this.state.owner.surname}</b></li>
+                        <li class="list-group-item">Date of Birth: <b>{this.state.owner.dateOfBirth}</b></li>
+                        <li class="list-group-item">Fiscal Code: <b>{this.state.owner.fiscalCode}</b></li>
+                        <li class="list-group-item">Phone Number: <b>{this.state.owner.phoneNumber}</b></li>
                     </ul>
                 </div>
             </div>

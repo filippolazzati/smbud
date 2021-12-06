@@ -7,7 +7,7 @@ const ObjectId = require("mongodb").ObjectId;
 
 recordRoutes.route("/getById/:id").get(function (req, res) {
   let db_connect = dbo.getDb();
-  let myquery = { _id: req.params.id} ;
+  let myquery = { _id: ObjectId(req.params.id)} ;
   db_connect
       .collection("certificates")
       .findOne(myquery, function (err, result) {

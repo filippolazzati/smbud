@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 
 const Vaccine = (props) => (
-    <li className="list-group-item">Type: {props.type} - Date: {props.date}</li>
+    <li className="list-group-item">Brand: <b>{props.type}</b> - Date: <b>{props.date}</b></li>
 );
 
 export default class VaccinesList extends Component{
@@ -15,16 +15,16 @@ export default class VaccinesList extends Component{
 
     vaccinesList(){
         return this.state.vaccines.map((vaccine) => {
-            return <Vaccine key={vaccine.id} type={vaccine.type} date={vaccine.date}/>
+            return <Vaccine key={vaccine.id} type={vaccine.type.brandName} date={vaccine.date}/>
         });
     }
 
     render(){
         return(
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Vaccines List</h5>
-                    <ul class="list-group list-group-flush">
+            <div className="card">
+                <div className="card-body">
+                    <h5 className="card-title">Vaccines List</h5>
+                    <ul className="list-group list-group-flush">
                         {this.vaccinesList()}
                     </ul>
                 </div>

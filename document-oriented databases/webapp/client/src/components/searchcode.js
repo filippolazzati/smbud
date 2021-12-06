@@ -12,31 +12,31 @@ class SearchCode extends Component {
     constructor(props){
         super(props);
 
-        this.onChangeCertificateId = this.onChangeCertificateId.bind(this);
+        this.onChangeCertificateCode = this.onChangeCertificateCode.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
 
         this.state = {
-            certificateId: "",
+            certificateCode: "",
             alertVisible: false,
         };
     }
 
-    onChangeCertificateId(e){
+    onChangeCertificateCode(e){
         this.setState({
-            certificateId: e.target.value,
+            certificateCode: e.target.value,
         });
     }
 
     onSubmit(e){
         e.preventDefault();
 
-        const certificateId = this.state.certificateId;
+        const certificateCode = this.state.certificateCode;
 
         axios
-            .get('http://localhost:5000/' + certificateId) //TODO
+            .get('http://localhost:5000/certificates/getByCode/' + certificateCode)
             .then((res) => {
-                if(res.data.location.length > 0){
-                    this.props.history.push("/location/" + res.data.location[0].id)
+                if(res.data){
+                    this.props.history.push("/certificate/" + res.data.code)
                 } else {
                     this.setState({
                         alertVisibile: true,
@@ -54,14 +54,14 @@ class SearchCode extends Component {
         return (
             <div>
                 <h1 className="display-6">Verify certificate validity</h1>
-                <form className="row g-2 justify-content-md-center" onSubmit={this.onSubmit}>
+                <form className="row g-2" onSubmit={this.onSubmit}>
                     <div className="col-4">
                         <input 
                             type="text" 
                             className="form-control form-control-lg" 
                             placeholder="Certificate ID" 
-                            value={this.state.certificateId}
-                            onChange={this.onChangeCertificateId}
+                            value={this.state.certificateCode}
+                            onChange={this.onChangeCertificateCode}
                         />                    
                     </div>
                     <div className="col-1">

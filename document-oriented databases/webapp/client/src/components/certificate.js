@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+import axios from 'axios';
+
 import PersonInfo from "./certificatecomponents/personinfo";
 import TestsList from "./certificatecomponents/testslist";
 import VaccinesList from "./certificatecomponents/vaccineslist";
@@ -9,34 +11,48 @@ export default class Certificate extends Component{
         super(props);
 
         this.state = {
-            certficateId: this.props.match.params.id,
-            vaccines: [
-                {id: "ABC123", type: "Moderna", date: "01/01/2021"},
-                {id: "DEF456", type: "Astrazeneca" , date: "01/06/2021"},
-            ],
-            tests: [
-                {id: "ABC123", type: "Rapid", date: "01/01/2021"},
-                {id: "DEF456", type: "Rapid" , date: "01/06/2021"},
-            ]
+            certficateCode: this.props.match.params.id,
+            certificate: null,
         }
     }
+
+    componentDidMount(){
+        axios.get('http://localhost:5000/certificates/getByCode/' + this.state.certficateCode)
+        .then((res) => {
+            this.setState({
+                certificate: res.data,
+            });
+        })
+        .catch((err) => console.log(err));
+    }
+    
+    calculateCertificateValidity(){
+        let lastVaccineDate
+    }
+
     render(){
-        return (
-            <div>
-                <h1>Certificate - ID: {this.state.certficateId}</h1>
-                <ValidityAlert valid={false} />
-                <hr />
-                <div className="row">
-                    <div className="col-5">
-                        <PersonInfo />
-                    </div>
-                    <div className="col-7">
-                        <VaccinesList vaccines={this.state.vaccines}/>
-                        <hr />
-                        <TestsList tests={this.state.tests}/>
+        if(this.state.certificate == null){
+            return(
+                <h1>Loading...</h1>
+            )
+        } else {
+            return (
+                <div>
+                    <h1>Certificate - Code: {this.state.certficateCode}</h1>
+                    <ValidityAlert valid={false} />
+                    <hr />
+                    <div className="row">
+                        <div className="col-5">
+                            <PersonInfo owner={this.state.certificate.owner}/>
+                        </div>
+                        <div className="col-7">
+                            <VaccinesList vaccines={this.state.certificate.vaccines}/>
+                            <hr />
+                            <TestsList tests={this.state.certificate.tests}/>
+                        </div>
                     </div>
                 </div>
-            </div>
-        )
+            )
+        }
     }
 }
