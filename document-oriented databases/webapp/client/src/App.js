@@ -6,6 +6,7 @@ import "bootstrap/dist/js/bootstrap.min.js";
 
 import Navbar from "./components/navbar";
 import Homepage from "./components/homepage";
+import Certificate from "./components/certificate";
 
 const App = () => {
     return (
@@ -14,6 +15,7 @@ const App = () => {
             <br />
             <div className="container">
                 <Route exact path="/" component={Homepage} />
+                <Route exact path="/certificate/:id" component={Certificate} />
             </div>
         </div>
     );

@@ -53,18 +53,19 @@ class SearchCode extends Component {
     render(){
         return (
             <div>
-                <form className="row g-2" onSubmit={this.onSubmit}>
-                    <div className="col-8">
+                <h1 className="display-6">Verify certificate validity</h1>
+                <form className="row g-2 justify-content-md-center" onSubmit={this.onSubmit}>
+                    <div className="col-4">
                         <input 
                             type="text" 
-                            className="form-control" 
+                            className="form-control form-control-lg" 
                             placeholder="Certificate ID" 
                             value={this.state.certificateId}
                             onChange={this.onChangeCertificateId}
                         />                    
                     </div>
                     <div className="col-1">
-                        <button type="submit" className="btn btn-outline-success mb-3">Search</button>
+                        <button type="submit" className="btn btn-lg btn-outline-success mb-3">Search</button>
                     </div>
                 </form>
                 {this.state.alertVisibile ? <Alert /> : null}
