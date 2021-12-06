@@ -15,7 +15,7 @@ export default class TestsList extends Component{
 
     testList(){
         return this.state.tests.map((test) => {
-            return <Test key={test.id} type={test.type} date={test.date}/>
+            return <Test key={test.date} type={test.type} date={test.date}/>
         });
     }
 

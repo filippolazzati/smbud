@@ -15,7 +15,7 @@ export default class VaccinesList extends Component{
 
     vaccinesList(){
         return this.state.vaccines.map((vaccine) => {
-            return <Vaccine key={vaccine.id} type={vaccine.type.brandName} date={vaccine.date}/>
+            return <Vaccine key={vaccine.date} type={vaccine.type.brandName} date={vaccine.date}/>
         });
     }
 
