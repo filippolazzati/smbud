@@ -70,7 +70,7 @@
 \section{Problem specification}
 The purpose of this project is to build an information system that is able to manage pandemic information for a given country. In particular, such system must be scalable enough to manage all the information about COVID-19 tests and vaccinations, and it should provide data at the granularity level required by a business perspective. Moreover, the storage system should be flexible enough in order to comply with the expiration dates of the certificates and, potentially, with the evolution of the rules.\\
 Since \verb|MongoDB| is a document-oriented database with the property of being schema-less, it perfectly matches this use case. Furthermore, because of its document-oriented structure, it solves the impedance mismatch problem and, thus, allows to retrieve data also through object-oriented code. The main drawback is the duplication of the data, which is, in a measure, acceptable in the scenario of the certificates.
-\section{Hypotheses}
+\section{Hypotheses} \label{hypotheses}
 The database is implemented under the following hypotheses:
 \begin{itemize}
     \item for each person owning a certificate some demographic details are known;
@@ -92,6 +92,7 @@ The database is implemented under the following hypotheses:
    \item Sputnik, which does not provide any valid certificate because of UE regulations.
 \end{enumerate}
 It should be noticed that the flexibility offered by a schema-less database like \verb|MongoDB| can be very useful in this case, since the details of the certificates with regards to the type of vaccine can change over time;
+\item the validity of the first dose of vaccine expires 3 months in case the person does not undergoes a second dose;
 \item each vaccine dose is characterized by:
 \begin{enumerate}
     \item the name of the brand that produces it;
@@ -114,10 +115,11 @@ It should be noticed that the flexibility offered by a schema-less database like
     \item the GPS coordinates of the location;
     \item optionally, the department (this can be present only for hospitals and big health structures);
 \end{enumerate}
-\item the validity of the first dose of vaccine expires 3 months in case the person does not undergoes a second dose;
 \item vaccines and tests are administered by authorized health personnel such as doctor and nurses, characterized by name, surname, fiscal code and the position (e.g. nurse, doctor);
 \item for each vaccine/test that is administered, the certificate includes the health personnel attending the administration;
-\item a doctor/nurse can administer a vaccine in a different place than the workplace (e.g. supermarket or another health structure).
+\item a doctor/nurse can administer a vaccine in a different place than the workplace (e.g. supermarket or another health structure);
+\item each certificate has a unique code of 6 digits that allows to retrieve it; such code does the same job of the QR code of the \verb|GREEN| \verb|PASS|;
+\item no person takes another test before that the 48h (or 72h in case of a pcr test) of a test resulted negative expire.
 \end{itemize}
 \newpage
 \section{Conceptual model}
@@ -128,7 +130,7 @@ Notice that the optional attributes have been marked with a star (*).\\
 The Entity-Relationship model contains 5 main different entities, that are related to each other through various relationships.
 \begin{itemize}
     \item \textit{PERSON} represents a person. Every \textit{PERSON} has a name, a surname and a fiscal code. Then there are 3 entities that inherit from \textit{PERSON}, namely \textit{OWNER}, \textit{EMERGENCYCONTACT} and \textit{MEDICALPERSONNEL}. It has been assumed that it is not relevant to insert the date of birth of the \textit{MEDICALPERSONNEL} in the certificate, and that it should be better to avoid to insert its phone number in it. Of course the attributes of \textit{PERSON} could be enlarged, but as a sample dataset we have believed that these three are enough;
-    \item \textit{CERTIFICATE} represents the main concept of the whole database. The \textit{CERTIFICATE} will be the document on which we put more or less all the data we have, because the \textit{CERTIFICATE} is at the level of granularity  with which users want to work with this data. We have preferred to represent such entity with only an identifier, since it gains all the data it owns through its relatiosnhips;
+    \item \textit{CERTIFICATE} represents the main concept of the whole database. The \textit{CERTIFICATE} will be the document on which we put more or less all the data we have, because the \textit{CERTIFICATE} is at the level of granularity  with which users want to work with this data. We have preferred to represent such entity with only an identifier and the unique code of 6 digits, since it gains all the data it owns through its relationships;
     \item \textit{LOCATION} represents a place where a vaccine or a test can be done. It should be remarked that we have decided to detail in-depth such entity, because it is relevant for this scenario. Because of the many attributes it has, you will notice that this is the only document that has not been added to the \textit{CERTIFICATE} document to avoid a useless waste of storage space (as a matter of fact, we have assumed that the \textit{LOCATION} is relevant but it is not required so much from the "business", therefore when it is asked they can wait some additional time);
     \item \textit{VACCINEDOSE} represents one single dose of vaccine received by a person; it has a name, the name of the brand, the lot number and the date of production;
     \item \textit{TEST} represents one single test taken by a person; it is characterised by a type (rapid or PCR), a result, a date and the validity (48 hourse or 72 hours).
@@ -146,68 +148,81 @@ Among these entities, some relations hold. In particular:
 The sample dataset we provide is made by the following 2 documents (and all the nested subdocuments). As previously said, the decision of avoid to embed the \verb|LOCATION| documents inside the \verb|CERTIFICATE| ones has been taken in order to prevent a huge and useless waste of storage space. The following is an example of a \verb|CERTIFICATE| document:
 \begin{minted}{json}
 {
- "_id": "certificate_1",
-
-  "owner": {
-    "name": "Mario",
-    "surname": "Conte",
-    "dateOfBirth": "1978-09-03",
-    "fiscalCode": "ZZZ",
-    "phoneNumber":"3453298222"
-  },
-
-  "emergencyContact": {
-    "name": "Mattia",
-    "surname": "Calabria",
-    "dateOfBirth": "1981-03-11",
-    "fiscalCode": "WWW",
-    "phoneNumber":"3481222910"
-  },
-
-  "vaccineDoses": [
-    {
-      "type": {
-	"brandName": "Pfizer",
-        "name": "Comirnaty",
-	"lot": "13438242871",
-	"productionDate": "2021-05-03"
+        "code": "3U4162",
+        "owner": {
+            "name": "John",
+            "surname": "Morris",
+            "dateOfBirth": "1986-07-14",
+            "fiscalCode": "JHNMRS86L14S677A",
+            "phoneNumber": 3313567314
         },
-
-      "numberOfDose": 1,
-      "date": "2021-09-10",
-      "location": "locationID",
-      "validity": 2160,
-
-      "medicalPersonnel": {
-        "name": "Marco",
-        "surname": "Inzaghi",
-	"fiscalCode": "YYY",
-	"position": "doctor"
-      }
+        "recovered": null,
+        "emergencyContact": {
+            "name": "Michelle",
+            "surname": "Hampton",
+            "dateOfBirth": "2006-03-31",
+            "fiscalCode": "MCHHPT06C71Q216S",
+            "phoneNumber": 3002475590
+        },
+        "vaccines": [
+            {
+                "type": {
+                    "name": "Comirnaty",
+                    "brandName": "Pfizer\/BioNTech",
+                    "lot": "NRZZZHOH",
+                    "productionDate": "2021-03-03"
+                },
+                "numberOfDose": 1,
+                "validity": 6480,
+                "date": "2021-04-06",
+                "medicalPersonnel": {
+                    "name": "Peter",
+                    "surname": "Davis",
+                    "fiscalCode": "PTRDVS48P04L453S",
+                    "position": "doctor"
+                },
+                "locationId": "location_949"
+            },
+            {
+                "type": {
+                    "name": "Comirnaty",
+                    "brandName": "Pfizer\/BioNTech",
+                    "lot": "KDTULQPG",
+                    "productionDate": "2021-04-15"
+                },
+                "numberOfDose": 2,
+                "validity": 6480,
+                "date": "2021-05-01",
+                "medicalPersonnel": {
+                    "name": "Robert",
+                    "surname": "Savage",
+                    "fiscalCode": "RBRSVG76R210827S",
+                    "position": "doctor"
+                },
+                "locationId": "location_1922"
+            }
+        ],
+        "tests": [
+            {
+                "type": "pcr",
+                "validity": 72,
+                "result": false,
+                "date": "2021-02-02",
+                "medicalPersonnel": {
+                    "name": "James",
+                    "surname": "Williams",
+                    "fiscalCode": "JMSWLM94C24X515S",
+                    "position": "doctor"
+                },
+                "locationId": "location_1924"
+            }
+        ]
     }
-  ],
-
-  "tests": [
-    {
-      "type": "rapid",
-      "result": false,
-      "date": "2021-08-02",
-      "location": "locationID",
-      "validity": 48,
-
-      "medicalPersonnel": {
-        "name": "Matteo",
-        "surname": "Rossi",
-	"fiscalCode": "XXX",
-	"position": "doctor"
-      }
-    }
-  ]
-}
 \end{minted}
 \vspace{0.3cm}
 A \verb|CERTIFICATE| document is recognized (like every document in \verb|MongoDB|) by an "\_id" and contains:
 \begin{itemize}
+    \item a unique 6-digits code different from the "\_id", that can be used to identify the certificate (such code has the same role of the QR code in the \verb|GREEN| \verb|PASS|);
     \item the owner of the document;
     \item the emergency contact of the owner of the document;
     \item a list of all the doses of vaccine received (in this way if the rules evolve, additional doses can be added to new documents);
@@ -217,49 +232,174 @@ A \verb|CERTIFICATE| document is recognized (like every document in \verb|MongoD
 The \verb|LOCATION| document is the following:
 \begin{minted}{json}
 {
-	"_id": "location_1",
-        "name": "Coop",
-	"typeOfService": "Supermarket",
-	"description": "Coop is a supermarket.",
-        "address": "Milano, via Nino Bixio, 64",
-        "coordinates": [48, 122]
-      }
+        "_id": "location_0",
+        "name": "Location 0",
+        "address": "VIA PANORAMICA 42, BORGO TOSSIGNANO",
+        "typeOfService": "vaccinationCenter",
+        "coordinates": [
+            43.2881,
+            12.12
+        ],
+        "department": null
+    }
 \end{minted}
-It is recognized by an "\_id" and contains all the attributes identified in the conceptual model (E-R) of the data. The \verb|CERTIFICATE| document contains links to it (when needed).\\ \\
-\vspace{1cm}
-The sample dataset has been created through some \verb|PHP| scripts ..... 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-chri spiega te
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+It is recognized by an "\_id" and contains all the attributes identified in the conceptual model (E-R) of the data. The \verb|CERTIFICATE| documents contain links to it (when needed).\\
+The sample dataset has been created through some \verb|PHP| scripts.
+\section{Import the sample dataset}
+The sample dataset is given through two different \verb|JSON| files, "certificates.json" and "locations.json". The former contains an array of certificate documents while the latter an array of location documents. For the sake of simplicity we have decided to generate on our own the "\_id" attribute of the locations.\\
+To import the dataset, you have to follow these steps :
+\begin{enumerate}
+    \item open a command prompt and type \begin{lstlisting}[language=bash]
+    mongod
+\end{lstlisting}
+\item open \verb|MongoDBCompass| and type the string "mongodb://127.0.0.1:27017/";
+\item create a new database called "db" and a new collection called "collection" inside it, then click on \textit{ADD DATA};
+\item import the two \verb|JSON| files "certificates.json" and "locations.json".
+\end{enumerate}
 \section{Queries and Commands}
 The following queries and commands have been developed in order to provide an example of usage of the system for typical usage scenarios.
 \subsection{Queries}
 We have identified the following different queries:
 \begin{enumerate}
-    \item \textbf{find all the  valid certificates}.\\ .... Explanation of the query .....
-    .....Code of the query ......
-    \item \textbf{find the type of vaccine which has been administered the most}.\\ .... Explanation of the query .....
-    .....Code of the query ......
-    \item \textbf{find the medical personnel who have administered more vaccines}.\\ .... Explanation of the query .....
-    .....Code of the query ......
-    \item \textbf{find how many vaccinated people there are in the system and how many doses they have done}.\\ .... Explanation of the query .....
-    .....Code of the query ......
-    \item \textbf{find the people who have taken only tests}.\\ .... Explanation of the query .....
-    .....Code of the query ......
-    \item \textbf{find the people who have healed}.\\ .... Explanation of the query .....
-    .....Code of the query ......
-    \item \textbf{find the locations with the highest number of vaccines administered}.\\ .... Explanation of the query .....
-    .....Code of the query ......
+\item \textbf{find all the people who have done the disease}.\\
+We simply have to check whether the "recovered" attribute is null or not:
+\begin{lstlisting}
+db.collection.find({"recovered":{$ne:null}}, {"owner": 1});
+    \end{lstlisting}
+    \item \textbf{find all the people who have undergone 3 vaccine doses}.\\
+    Thanks to the \$size operator, we can make a query on the length of an array:
+    \begin{lstlisting}
+db.collection.find({vaccines: {$size: 3}}, {"owner": 1});
+    \end{lstlisting}
+    \item \textbf{find all the valid certificates}.\\
+    According to the hypotheses (see section \ref{hypotheses}), a certificate is valid in 3 cases:
+    \begin{enumerate}
+        \item the owner took a (negative) test in the last hours -$>$ 48h or 72h of validity;
+        \item the owner healed from the disease (verified through a negative test after a positive one) -$>$ 6 months $\approx$ 4320 hours of validity;
+        \item the owner underwent at least one vaccination dose -$>$ 3 months of validity for the first dose, then the validity varies according to the type of vaccine.
+    \end{enumerate}
+    Therefore, we can write 3 different queries to retrieve certificates that are valid for different reasons.\\
+    \begin{enumerate}
+        \item Certificates of people who have recovered in the last 6 months:
+    \begin{lstlisting}
+db.collection.find({"recovered": {$gte: new Date(ISODate().getTime() - 1000 * 60 * 60 * 24 * 30 * 6)}});
+    \end{lstlisting}
+    \item certificates of people who have taken a (negative) test in the last hours (48 or 72 according to the type of test):
+    \begin{lstlisting}
+db.collection.find({$or: [
+{tests: {$elemMatch: {validity: 48, result: false, date: {$gte: new Date(ISODate().getTime() - 1000 * 60 * 60 * 24 * 2)}}}}, 
+{tests: {$elemMatch: {validity: 72, result: false, date: {$gte: new Date(ISODate().getTime() - 1000 * 60 * 60 * 24 * 3)}}}}]});
+    \end{lstlisting}
+    \textbf{N.B.:} it should be remarked that this query is correct only thanks to the assumption that states that no person can take another test while having taken a negative test in the last 48/72 hours.
+    \item certificates of people who have undergone vaccination not too much time ago and therefore the certificates are valid (notice that, since the first dose gives a valid certificate after 15 days, we have to add such value in the conditions):
+    \begin{lstlisting}
+db.collection.find({$or: [
+    {vaccines: {$elemMatch: {validity: 2160, date: {$gte: new Date(ISODate().getTime() - 1000 * 60 * 60 * 2160 + 1000 * 60 * 60 * 24 * 15)}}}},
+    {vaccines: {$elemMatch: {validity: 6480, date: {$gte: new Date(ISODate().getTime() - 1000 * 60 * 60 * 6480)}}}},
+    {vaccines: {$elemMatch: {validity: 4320, date: {$gte: new Date(ISODate().getTime() - 1000 * 60 * 60 * 4320)}}}}
+]});
+    \end{lstlisting}
+    It should be noticed that this query is not exactly correct, because there is the possibility that a person is tested positive after having received the vaccine, and thus her certificate is not valid anymore. However, for the sake of simplicity, we will check this fact with \verb|JavaScript| in the user interface.
+    \end{enumerate}
+    \item \textbf{find the type of vaccine which has been administered the most}.\\
+    It is clear that we have to use aggregations for this query. The pipeline starts from \verb|$unwind|, which allows to expand the content of the array "vaccines"; next, \verb|$group| allows to group the documents by brandName, and finally we sort the results through \verb|$sort| and take the maximum using \verb|$limit|. 
+    \begin{lstlisting}
+db.collection.aggregate([
+    {
+        '$unwind': {
+            'path': '$vaccines'
+        }
+    }, {
+        '$group': {
+            '_id': '$vaccines.type.brandName', 
+            'count': {
+                '$sum': 1
+            }
+        }
+    }, {
+        '$sort': {
+            'count': -1
+        }
+    }, {
+        '$limit': 1
+    }
+]);
+    \end{lstlisting}
+    \item \textbf{find the medical personnel who has administered more vaccines}.\\This query is rather similar to the previous one; indeed, we need again to use aggregation and the pipeline proceeds along the same operators:
+    \begin{lstlisting}
+db.collection.aggregate([
+    {
+        '$unwind': {
+            'path': '$vaccines'
+        }
+    }, {
+        '$group': {
+            '_id': {
+                'fiscalCode': '$vaccines.medicalPersonnel.fiscalCode', 
+                'name': '$vaccines.medicalPersonnel.name', 
+                'surname': '$vaccines.medicalPersonnel.surname', 
+                'position': '$vaccines.medicalPersonnel.position'
+            }, 
+            'count': {
+                '$sum': 1
+            }
+        }
+    }, {
+        '$sort': {
+            'count': -1
+        }
+    }, {
+        '$limit': 1
+    }
+]);
+\end{lstlisting}
+    \item \textbf{find the people who have taken only tests}.\\
+    This query allows to retrieve all the people who have never undergone vaccination but who have taken at least one test. Since the owner of a certificate is inside the certificate, we simply have to project the owner: 
+    \begin{lstlisting}
+    db.collection.find(
+	{"$and":[{"vaccines.date":{$exists:false}},{"tests.date":{$exists:true}}]},
+	{"owner": 1});
+\end{lstlisting}
+    \item \textbf{find the 10 locations with the highest number of vaccines administered}.\\
+    Like two previous queries, again we are looking for the maximum, therefore the pipeline is the same. The only difference is that now we are looking for the top 10 locations, thus the \verb|$limit| operator has a 10 instead of a 1:
+    \begin{lstlisting}
+    db.collection.aggregate([
+    {
+        '$unwind': {
+            'path': '$vaccines'
+        }
+    }, {
+        '$group': {
+            '_id': '$vaccines.locationId', 
+            'count': {
+                '$sum': 1
+            }
+        }
+    }, {
+        '$sort': {
+            'count': -1
+        }
+    }, {
+        '$limit': 10
+    }
+]);
+    \end{lstlisting}
     \end{enumerate}
 \subsection{Commands}
 We have identified the following commands to show how the system works:\\
 \begin{enumerate}
     \item \textbf{insert a new certificate because of a vaccine dose}.\\ .... Explanation of the command .....
-    .....Code of the command ......
+    \begin{lstlisting}
+    
+    \end{lstlisting}
     \item \textbf{insert a new certificate because of a test}.\\ .... Explanation of the command .....
-    .....Code of the command ......
+    \begin{lstlisting}
+    
+    \end{lstlisting}
     \item \textbf{insert a certificate because a new person has received the first vaccine dose}.\\ .... Explanation of the command .....
-    .....Code of the command ......
+    \begin{lstlisting}
+    
+    \end{lstlisting}
 \end{enumerate}
 \section{User Interface}
     \subsection{Description}
