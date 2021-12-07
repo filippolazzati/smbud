@@ -10,6 +10,7 @@ const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 app.use("/certificates", require("./routes/certificates"));
+app.use("/locations", require("./routes/locations"));
 
 const dbo = require('./db/conn');
 

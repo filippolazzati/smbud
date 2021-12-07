@@ -77,7 +77,7 @@ export default class Certificate extends Component{
         } else {
             return (
                 <div>
-                    <h1>Certificate - Code: {this.state.certficateCode}</h1>
+                    <h1>Certificate - {this.state.certficateCode}</h1>
                     <ValidityAlert valid={this.state.valid} expiration={this.state.expiration}/>
                     <hr />
                     <div className="row">
