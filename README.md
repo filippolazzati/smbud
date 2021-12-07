@@ -10,7 +10,7 @@ The first directory is about the implementation of a simple contact tracing app 
 ## Project 2 - Document-oriented databases
 The second directory is about the implementation of a simple database about vaccination certifications using [MongoDB](https://mongodb.com/):
 - In the *deliverables* folder you can find the pdf report of the project, along with the Latex code;
-- In the *sample dataset and code* you can find the sample dataset as CSV files you have to import into your [MongoDB](https://mongodb.com/) database;
+- In the *sample dataset* you can find the sample dataset as JSON files you have to import into your [MongoDB](https://mongodb.com/) database;
 - In the *webapp* folder you can find a simple implementation of a client and a server that allow to work with this document-oriented database.
 
 ## Project 3
