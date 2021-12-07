@@ -34,32 +34,33 @@ export default class Certificate extends Component{
     
     calculateCertificateValidity(){
         let validCertificate = false;
-        let expiration = new Date();
+        let today = new Date();
+        let expiration = null;
         this.state.certificate.vaccines.forEach(vaccine => { //Check if there is a valid vaccine
             let vaccineExpiration = new Date(vaccine.date);
             vaccineExpiration.setTime(vaccineExpiration.getTime() + (vaccine.validity*60*60*1000));
-            if(vaccineExpiration > expiration){
-                validCertificate = true;
+            if(!expiration || vaccineExpiration > expiration)
                 expiration = vaccineExpiration;
-            }
+            if(vaccineExpiration > today)
+                validCertificate = true;
         });
         this.state.certificate.tests.forEach(test => { //Check if there is a valid test
             let testExpiration = new Date(test.date);
             testExpiration.setTime(testExpiration.getTime() + (test.validity*60*60*1000));
-            if(testExpiration > expiration){
-                validCertificate = true;
+            if(!expiration || testExpiration > expiration)
                 expiration = testExpiration;
-            }
+            if(testExpiration > today)
+                validCertificate = true;
         });
         if(this.state.certificate.tests.size > 1){ //Check if the owner is recovered
             if(!this.state.certificate.tests[this.state.certificate.tests.sizesize-1].result 
                 && this.state.certificate.tests[this.state.certificate.tests.size-2].result){
                 let recoveryExpiration = new Date(this.state.certificate.tests[this.state.certificate.tests.size-1]);
                 recoveryExpiration.setTime(recoveryExpiration.getTime() + (4320*60*60*1000));
-                if(recoveryExpiration > expiration){
-                    validCertificate = true;
+                if(!expiration || recoveryExpiration > expiration)
                     expiration = recoveryExpiration;
-                }
+                if(recoveryExpiration > today)
+                    validCertificate = true;
             }
         }
         this.setState({
