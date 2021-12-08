@@ -261,7 +261,7 @@ The following queries and commands have been developed in order to provide an ex
 \subsection{Queries}
 We have identified the following different queries:
 \begin{enumerate}
-\item \textbf{find all the people who have done the disease}.\\
+\item \textbf{find all the people who have recovered from the disease}.\\
 We simply have to check whether the "recovered" attribute is null or not:
 \begin{lstlisting}
 db.collection.find({"recovered":{$ne:null}}, {"owner": 1});
@@ -356,9 +356,9 @@ db.collection.aggregate([
     \item \textbf{find the people who have taken only tests}.\\
     This query allows to retrieve all the people who have never undergone vaccination but who have taken at least one test. Since the owner of a certificate is inside the certificate, we simply have to project the owner: 
     \begin{lstlisting}
-    db.collection.find(
-	{"$and":[{"vaccines.date":{$exists:false}},{"tests.date":{$exists:true}}]},
-	{"owner": 1});
+    db.collection.find({
+            "$and":[{"$expr":{$eq:[{$size:"$vaccines"},0]}},{"$expr":{$gte:[{$size:"$tests"},1]}}]
+    });
 \end{lstlisting}
     \item \textbf{find the 10 locations with the highest number of vaccines administered}.\\
     Like two previous queries, again we are looking for the maximum, therefore the pipeline is the same. The only difference is that now we are looking for the top 10 locations, thus the \verb|$limit| operator has a 10 instead of a 1:
@@ -384,21 +384,137 @@ db.collection.aggregate([
     }
 ]);
     \end{lstlisting}
+    \item \textbf{find how many vaccinated people there are in the system}.\\
+    Add description...\\
+\begin{lstlisting}
+db.collection.aggregate([
+            {
+                '$match': {
+                    '$expr': {
+                        '$gte': [
+                            {
+                                '$size': '$vaccines'
+                            }, 1
+                        ]
+                    }
+                }
+            }, {
+                '$count': 'numOfVaccinetedPeople'
+            }
+        ]);
+\end{lstlisting}
+    \item \textbf{find the vaccinated people and for each one how many doses done}.\\
+    Add description...\\
+    \begin{lstlisting}
+        db.collection.aggregate([
+            {
+               '$project': {
+              'person': '$owner'
+                  'numberOfDoses': {
+                      $size: '$vaccines'
+                }
+             }
+         }]); 
+    \end{lstlisting}
     \end{enumerate}
 \subsection{Commands}
 We have identified the following commands to show how the system works:\\
 \begin{enumerate}
-    \item \textbf{insert a new certificate because of a vaccine dose}.\\ .... Explanation of the command .....
+    \item \textbf{Update a certificate because of a new vaccine dose}.\\ .... Explanation of the command .....
     \begin{lstlisting}
-    
+        db.collection.updateOne(
+            {
+                code: 'ER20YA'
+                }, {
+                    $push: {
+                        'vaccines': {
+                        'type' : {
+                            'name': 'Vaxzevria',
+                            'brandName': 'AstraZeneca',
+                            'lot': 'K6OGB2VP',
+                               'productionDate':ISODate('2020-12-27T06:50:3.000Z')
+                            },
+                        'numberOfDose': 1,
+                        'validity': 2160,
+                        'date': ISODate('2021-02-12T06:50:36.000Z'),
+                        'medicalPersonnel': {
+                            'name': 'Harry',
+                            'surname': 'Cooper',
+                            'fiscalCode': 'HRRCPR45H08A966A',
+                            'position': 'other'
+                               },
+                        'locationId': 'location_1175'
+                        }
+                    }
+            });
     \end{lstlisting}
-    \item \textbf{insert a new certificate because of a test}.\\ .... Explanation of the command .....
+    \item \textbf{Update a certificate because of a new test}.\\ .... Explanation of the command .....\\ The application checks if the owner has previous tests and if the last test taken is positive: if the new one is negative it will automatically update the recovered field of the document with the date of the new test
     \begin{lstlisting}
-    
+        db.collection.updateOne({
+            code: ‘ER20YA’
+            }, {
+            $push : {
+                ‘tests’: {
+                    'type': 'rapid',
+                            'validity': 48,
+                            'result': false,
+                            'date': ISODate(‘2021-03-06T21:26:00.000Z’),
+                            'medicalPersonnel': {
+                               'name': 'Albert',
+                                'surname': 'Saults',
+                                'fiscalCode': 'LBRSTS17S13W706O',
+                                'position': 'nurse'
+                                },
+                            'locationId': 'location_1988'
+                }
+            }
+        
+        });
     \end{lstlisting}
-    \item \textbf{insert a certificate because a new person has received the first vaccine dose}.\\ .... Explanation of the command .....
+    \item \textbf{insert a certificate because a new person has received the first vaccine dose or has made the first test}.\\ .... Explanation of the command .....
     \begin{lstlisting}
+db.collection.insert({
     
+    'code': 'QSA4GP',
+    'owner': {
+        'name': 'Michael',
+        'surname': 'Penn',
+        'dateOfBirth': '1986-06-03',
+        'fiscalCode': 'MCHPNN86H03C751C',
+        'phoneNumber': {
+            '$numberLong': '3121784343'
+        }
+    },
+    'recovered': null,
+    'emergencyContact': {
+        'name': 'Esther',
+        'surname': 'Bernard',
+        'dateOfBirth': '1968-06-30',
+        'fiscalCode': 'STHBNR68H70R928L',
+        'phoneNumber': {
+            '$numberLong': '3585672957'
+        }
+    },
+    'vaccines': [{
+        'type': {
+            'name': 'Janssen',
+            'brandName': 'J&J',
+            'lot': '5S3QLBDA',
+            'productionDate': ISODate('2021-04-14T02:05:44.000Z')
+        },
+        'numberOfDose': 1,
+        'validity': 4320,
+        'date': ISODate('2021-04-28T02:05:44.000Z'),
+        'medicalPersonnel': {
+            'name': 'Vincent',
+            'surname': 'Vang',
+            'fiscalCode': 'VNCVNG55R160373I',
+            'position': 'nurse'
+        },
+        'locationId': 'location_1006'
+    }],
+    'tests': []
+ });
     \end{lstlisting}
 \end{enumerate}
 \section{User Interface}
