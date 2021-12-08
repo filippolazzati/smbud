@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 
 const Vaccine = (props) => (
-    <li className="list-group-item">Brand: <b>{props.type}</b> - Date: <b>{props.date}</b></li>
+    <li className="list-group-item">Brand: <b>{props.type}</b> - Date: <b>{new Date(props.date).toLocaleDateString('en-GB')}</b></li>
 );
 
 export default class VaccinesList extends Component{
