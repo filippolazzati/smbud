@@ -53,16 +53,13 @@ export default class Certificate extends Component{
             if(testExpiration > today)
                 validCertificate = true;
         });
-        if(this.state.certificate.tests.size > 1){ //Check if the owner is recovered
-            if(!this.state.certificate.tests[this.state.certificate.tests.sizesize-1].result 
-                && this.state.certificate.tests[this.state.certificate.tests.size-2].result){
-                let recoveryExpiration = new Date(this.state.certificate.tests[this.state.certificate.tests.size-1]);
-                recoveryExpiration.setTime(recoveryExpiration.getTime() + (4320*60*60*1000));
-                if(!expiration || recoveryExpiration > expiration)
-                    expiration = recoveryExpiration;
-                if(recoveryExpiration > today)
-                    validCertificate = true;
-            }
+        if(this.state.certificate.recovered){ //Check if the owner is recovered
+            let recoveryExpiration = new Date(this.state.certificate.recovered);
+            recoveryExpiration.setTime(recoveryExpiration.getTime() + (4320*60*60*1000));
+            if(!expiration || recoveryExpiration > expiration)
+                expiration = recoveryExpiration;
+            if(recoveryExpiration > today)
+                validCertificate = true;
         }
         this.setState({
             valid: validCertificate,
@@ -95,16 +92,16 @@ export default class Certificate extends Component{
                     <div className="row">
                         <div className="col">
                             <Link to={"/certificate/" + this.state.certficateCode + "/addVaccine"}>
-                                <button type="button" className="btn btn-danger btn-lg">Add vaccine dose</button>
+                                <button type="button" className="btn btn-primary btn-lg">Add vaccine dose</button>
                             </Link>
                         </div>
                         <div className="col">
                             <Link to={"/certificate/" + this.state.certficateCode + "/addTest"}>
-                                <button type="button" className="btn btn-danger btn-lg">Add test</button>
+                                <button type="button" className="btn btn-primary btn-lg">Add test</button>
                             </Link>
                         </div>
                     </div>
-                        
+                    <br />
                 </div>
             )
         }
