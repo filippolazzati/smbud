@@ -519,36 +519,25 @@ db.collection.insert({
 \end{enumerate}
 \section{User Interface}
     \subsection{Description}
-    We have provided a demo of a User Interface in order to show some use cases of the database and how to apply some sample queries/commands to it. We have implemented a simple client-server application with some basic functionalities to query and update the database. The application is implemented in \verb|JavaScript|, using \textit{node.js} and \textit{express.js} to run the server and the \textbf{React} framework for the front-end.
-    \subsection{Functionalities}
+    We have provided a demo of a User Interface in order to implement some real-life use cases and to show some meaningful interaction between the database and external applications. The demo consists of a simple client-server application implemented in \verb|node.js|, using \verb|express.js| and the \textit{MongoDB Node Driver} for the back-end and the \verb|React| framework for the front-end.
+    The UI aims to simulate a real-life system for the verification of COVID-19 certificates: by inserting the certification code into the system, the user will be able to verify whether the corresponding certificate is valid or not and to visualize the certificate's data. Furthermore, the UI provides some other functionalities to interact in various ways with the database
     The application allows to:
     \begin{itemize}
-    \item ...
-    \item ...
+    \item Verify whether a certificate is valid or not
+    \item Insert a new vaccine or a new test in a given certificate
+    \item Visualize a list of locations, their information and statistics.
     \end{itemize}
 \section{User guide}
 \subsection{Requirements}
-In order to run the application, the following software need to be installed on your machine:
-\begin{itemize}
-    \item ...
-    \item ...
-\end{itemize}
-\subsection{Database}
-To run the database:
+In order to run the application is needed an existing database with the provided data (see Section 4) and \textit{Node.js} installed on the machine.
+After having installed \textit{Node.js}, follow these steps to run the application:
 \begin{enumerate}
-    \item 
-\end{enumerate}
-\subsection{Server}
-After having installed \textit{Node.js}, to run the server do:
-\begin{enumerate}
-    \item ...
-    \item ...
-\end{enumerate}
-\subsection{Client}
-After having started the server, to run the front-end of the application do:
-\begin{enumerate}
-    \item ...
-    \item ...
+    \item Move to the \verb|webapp| folder;
+    \item In the \verb|server| folder, edit \verb|config.env| inserting username, password and name of the database in the corresponding placeholders (remember to remove \verb|'<'| and \verb|'>'|);
+    \item Open the terminal in the \verb|webapp| folder;
+    \item To install dependencies and build the application, run \verb|npm run build|. This command will install the necessary \textit{node modules} and will build the front-end application;
+    \item To start the application, run \verb|npm start|;
+    \item To use the application, open your browser and go to \verb|http://localhost:5000|.
 \end{enumerate}
 \section{References and sources}
 \begin{itemize}
