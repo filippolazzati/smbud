@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import axios from 'axios';
+import { Link } from "react-router-dom";
 
 import PersonInfo from "./certificatecomponents/personinfo";
 import TestsList from "./certificatecomponents/testslist";
@@ -67,7 +68,6 @@ export default class Certificate extends Component{
             valid: validCertificate,
             expiration: expiration,
         })
-        console.log(this.state);
     }
 
     render(){
@@ -91,6 +91,20 @@ export default class Certificate extends Component{
                             <TestsList tests={this.state.certificate.tests}/>
                         </div>
                     </div>
+                    <hr />
+                    <div className="row">
+                        <div className="col">
+                            <Link to={"/certificate/" + this.state.certficateCode + "/addVaccine"}>
+                                <button type="button" className="btn btn-danger btn-lg">Add vaccine dose</button>
+                            </Link>
+                        </div>
+                        <div className="col">
+                            <Link to={"/certificate/" + this.state.certficateCode + "/addTest"}>
+                                <button type="button" className="btn btn-danger btn-lg">Add test</button>
+                            </Link>
+                        </div>
+                    </div>
+                        
                 </div>
             )
         }
