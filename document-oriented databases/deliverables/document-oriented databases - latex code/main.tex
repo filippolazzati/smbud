@@ -538,7 +538,6 @@ db.certificates.insert({
     \end{lstlisting}
 \end{enumerate}
 \section{User Interface}
-    \subsection{Description}
     We have provided a demo of a User Interface in order to implement some real-life use cases and to show some meaningful interaction between the database and external applications. The demo consists of a simple client-server application implemented in \verb|node.js|, using \verb|express.js| and the \textit{MongoDB Node Driver} for the back-end and the \verb|React| framework for the front-end.\\
     The UI aims to simulate a real-life system for the verification of COVID-19 certificates: by inserting the 6-digits certification code into the system, the user will be able to verify whether the corresponding certificate is valid or not and to visualize the certificate's data. Furthermore, the UI provides some other functionalities to interact in various ways with the database, that are:
     \begin{itemize}
@@ -547,7 +546,6 @@ db.certificates.insert({
     \item visualize a list of locations, their information and statistics.
     \end{itemize}
 \section{User guide}
-\subsection{Requirements}
 In order to run the application, you need a MongoDB database with the provided data (see Section \ref{import}) and \textit{Node.js} installed on the machine.\\
 After having installed \textit{Node.js}, follow these steps to run the application:
 \begin{enumerate}
