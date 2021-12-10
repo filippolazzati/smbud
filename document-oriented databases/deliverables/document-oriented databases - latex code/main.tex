@@ -146,7 +146,7 @@ Among these entities, some relations hold. In particular:
 \end{itemize}
 \newpage
 \section{Sample dataset}
-\subsection{Example of documents}
+\subsection{Documents examples}
 The sample dataset we provide, created through some \verb|PHP| scripts, is made of the following two documents (and all the nested subdocuments). As previously said, the decision to avoid to embed the \verb|LOCATION| documents inside the \verb|CERTIFICATE| ones has been taken in order to prevent a huge and useless waste of storage space. The following is an example of a \verb|CERTIFICATE| document:
 \begin{minted}{json}
 {
@@ -172,11 +172,15 @@ The sample dataset we provide, created through some \verb|PHP| scripts, is made 
                     "name": "Spikevax",
                     "brandName": "Moderna",
                     "lot": "HJLTXE5E",
-                    "productionDate": 2021-01-07T21:13:06.000+00:00
+                    "productionDate": {
+                        "$date": "2021-01-07T22:13:06+01:00"
+                    }
                 },
                 "numberOfDose": 1,
                 "validity": 2160,
-                "date": 2021-01-28T21:13:06.000+00:00,
+                "date": {
+                    "$date": "2021-01-28T22:13:06+01:00"
+                },
                 "medicalPersonnel": {
                     "name": "Scott",
                     "surname": "Mckinney",
@@ -191,7 +195,9 @@ The sample dataset we provide, created through some \verb|PHP| scripts, is made 
                 "type": "rapid",
                 "validity": 48,
                 "result": false,
-                "date": 2020-08-09T11:18:43.000+00:00,
+                "date": {
+                    "$date": "2020-08-09T13:18:43+02:00"
+                },
                 "medicalPersonnel": {
                     "name": "Robert",
                     "surname": "Savage",
