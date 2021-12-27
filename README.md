@@ -13,5 +13,6 @@ The second directory is about the implementation of a simple database about vacc
 - In the *sample dataset* you can find the sample dataset as JSON files you have to import into your [MongoDB](https://mongodb.com/) database;
 - In the *webapp* folder you can find a simple implementation of a client and a server that allow to work with this document-oriented database.
 
-## Project 3
-To be determined
+## Project 3 - Information-retrieval databases
+The third directory is about the implementation of a simple database about vaccination administration using [ElasticSearch](https://www.elastic.co/):
+- In the *deliverables* folder you can find the pdf report of the project, along with the Latex code.
