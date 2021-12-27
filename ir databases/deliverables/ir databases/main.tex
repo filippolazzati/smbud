@@ -575,6 +575,21 @@ This command is the easiest; we simply have to make a \verb|POST| with "\_doc", 
   "codice_regione_ISTAT": 17
 }
 \end{lstlisting}
+\item \textbf{Add the new field "dosi\_totali"}.\\
+We have to use a script along with the \verb|PUT| method:
+\begin{lstlisting}
+PUT somministrazioni-vaccini-latest/_mapping
+{
+  "runtime": {
+    "dosi_totali": {
+      "type": "long",
+      "script": {
+        "source": "emit(doc['prima_dose'].value + doc['seconda_dose'].value + doc['pregressa_infezione'].value + doc['dose_addizionale_booster'].value);"
+      }
+    }
+  }
+}
+\end{lstlisting}
 \end{enumerate}
 
 \section{Kibana Dashboard}
