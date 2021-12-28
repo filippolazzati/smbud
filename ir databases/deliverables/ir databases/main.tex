@@ -71,7 +71,7 @@
 The purpose of this project is to design, store and query data on a NoSQL database in order to analyze data about COVID-19 vaccination statistics.\\ Starting from an open \href{https://raw.githubusercontent.com/italia/covid19-opendata-vaccini/master/dati/somministrazioni-vaccini-latest.csv}{dataset} containing raw data about the distribution and administration of COVID-19 vaccines in Italian regions, the main goal of the project is to obtain relevant information through queries and graphs.\\
 To perform this task, the dataset has been loaded into \textbf{ElasticSearch}, a search engine with an internal database focused on high performances that interacts with external components through RESTful APIs. Once loaded into the search engine, information can be retrieved from the dataset not only through queries but also through Kibana, a powerful user interface that allows to visualize ElasticSearch data. More specifically, through \textbf{Kibana} it is possible to create Dashboards that generate and display graphs and other significant information in an intuitive way.\\
 \subsection{Dataset}
-The used dataset is provided by the Italian Government and contains the official data about vaccines distribution and administration. More specifically it provides regional overview of the amount of doses administered every day in the time period between 27/12/2020 and today.
+The used dataset is provided by the Italian Government and contains the official data about vaccines distribution and administration. More specifically it provides a regional overview of the amount of doses administered every day in the time period between December 27th, 2020 and today.
 The dataset contains 15 fields, which are briefly summarized in the following:
 \begin{itemize}
     \item \textbf{index}, a unique identifier of the record;
@@ -91,7 +91,7 @@ The dataset contains 15 fields, which are briefly summarized in the following:
     \item \textbf{nome\_regione}, the name of the region.
 \end{itemize}
 The way this dataset has been imported into \verb|ElasticSearch| is shown in section \ref{Conceptual model}.\\
-According to the project's specifications, the possibility of integrating the project with an additional dataset is contemplated. Therefore, we have decided to add a secondary dataset,\href{https://github.com/italia/covid19-opendata-vaccini/blob/master/dati/consegne-vaccini-latest.csv}{consegne-vaccini-latest}, that contains additional information about the amount of daily delivered doses in the same time period, to better contextualise the primary dataset. Such secondary dataset contains 8 field, briefly explained in the following:
+According to the project's specifications, the possibility of integrating the project with an additional dataset is contemplated. Therefore, we have decided to add a secondary dataset, \href{https://github.com/italia/covid19-opendata-vaccini/blob/master/dati/consegne-vaccini-latest.csv}{consegne-vaccini-latest}, that contains additional information about the amount of daily delivered doses in the same time period, to better contextualise the primary dataset. Such secondary dataset contains 8 field, briefly explained in the following:
 \begin{itemize}
     \item \textbf{index}, a unique identifier of the record;
     \item \textbf{area}, an acronym of the region at issue;
@@ -575,8 +575,9 @@ This command is the easiest; we simply have to make a \verb|POST| with "\_doc", 
   "codice_regione_ISTAT": 17
 }
 \end{lstlisting}
-\item \textbf{Add the new field "dosi\_totali"}.\\
-We have to use a script along with the \verb|PUT| method:
+\item \textbf{Add a runtime field}.\\
+Runtime fields are fields evaluated at query time. They allow us to add fields to existing documents without reindexing data and to define additional fields without modifying the schema. Here, a useful runtime field might be the sum of the total doses, since in each record the doses are grouped by type of administration. By creating the runtime field \verb|dosi_totali|, we add an additional field to each record containing the desired information and to facilitate the creation of other queries.
+To create a runtime field, we have to use a script along with the \verb|PUT| method, specifying the name of the field, its type and its source:
 \begin{lstlisting}
 PUT somministrazioni-vaccini-latest/_mapping
 {
@@ -608,6 +609,59 @@ The dashboard displays the following information and graphs:
     \item total number of delivered doses;
     \item delivered doses per region;
     \item delivered doses per week.
+\end{itemize}
+
+\subsection{Dashboard visualizations}
+In this section are provided screenshots of the various visualizations created on the Kibana Dashboard and a brief explanation of the information contained in each of them.
+\begin{itemize}
+    \item \textbf{Overview of the vaccine doses administrations}
+    \begin{figure}
+        \centering
+        \includegraphics[scale=0.3]{ir databases/screenshots/adm_overview.png}
+        \caption{Overview of the vaccine doses administrations}
+        \label{fig:adm_overview}
+    \end{figure}
+    \item \textbf{Doses administration by region, visualized on the Italian territory}
+    \begin{figure}
+        \centering
+        \includegraphics[scale=0.3]{ir databases/screenshots/map.png}
+        \caption{Doses administration by region, visualized on the Italian territory}
+        \label{fig:map}
+    \end{figure}
+    \item \textbf{Administered doses per supplier}
+    \begin{figure}
+        \centering
+        \includegraphics[scale=0.3]{ir databases/screenshots/adm_supplier.png}
+        \caption{Administered doses per supplier}
+        \label{fig:adm_supplier}
+    \end{figure}
+    \item \textbf{Weekly administered doses, grouped by various metrics}
+    \begin{figure}
+        \centering
+        \includegraphics[scale=0.3]{ir databases/screenshots/adm_weekly1.png}
+        \caption{Weekly administered doses, grouped by supplier and age range}
+        \label{fig:adm_weekly1}
+    \end{figure}
+    \begin{figure}
+        \centering
+        \includegraphics[scale=0.3]{ir databases/screenshots/adm_weekly2.png}
+        \caption{Weekly administered doses, grouped by gender}
+        \label{fig:adm_weekly2}
+    \end{figure}
+    \item \textbf{Overview of the vaccine deliveries}
+    \begin{figure}
+        \centering
+        \includegraphics[scale=0.3]{ir databases/screenshots/del_overview.png}
+        \caption{Overview of the vaccine deliveries}
+        \label{fig:del_overview}
+    \end{figure}
+    \item \textbf{Weekly delivered/administered doses comparison}
+    \begin{figure}
+        \centering
+        \includegraphics[scale=0.3]{ir databases/screenshots/del_weekly.png}
+        \caption{Weekly delivered/administered doses comparison}
+        \label{fig:del_weekly}
+    \end{figure}
 \end{itemize}
 
 
