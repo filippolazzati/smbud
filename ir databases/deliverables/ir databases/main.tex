@@ -220,14 +220,14 @@ In this section we present some queries and some commands that we consider usefu
 }{curl};
 \item \verb|Kibana|, the graphical user interface of \verb|ElasticSearch|. This is the way we adopt.
 \end{itemize}
-You have to notice also that you have to upload the datasets with names "somministrazioni-vaccini-latest" and "consegne-vaccini-latest" in order to use the following queries and commands.
+You have to notice also that you have to upload the datasets with names "\verb|somministrazioni_vaccini|" and "\verb|consegne_vaccini|" in order to use the following queries and commands.
 \subsection{Queries}
 We have identified the following queries:
 \begin{enumerate}
 \item \textbf{find the number of vaccines administered by brand in the last 30 days and also the brand with the highest number}.\\
 In order to perform this query, we have to use the \verb|GET| method (like all the other queries). Moreover, we have to filter the results through "query" to retrieve data that is not older than 30 days and then we have to exploit a script to sum the values of fields "sesso\_maschile" and "sesso\_femminile". Then, we have to aggregate by brand ("fornitore") to compute meaningful sums. Finally, to retrieve the brand with the highest number of vaccines administered we have to exploit also the "max\_bucket" construct:
 \begin{lstlisting}
-GET /somministrazioni-vaccini-latest/_search
+GET /somministrazioni_vaccini/_search
 {
   "size": 0,
   "query": {
@@ -272,7 +272,7 @@ GET /somministrazioni-vaccini-latest/_search
 \item \textbf{find the region with the highest number of first vaccinations in the last 3 months}.\\
 The query is similar to the previous one. We have to filter the results by date through "query", and then exploit nested "aggs" to compute the sum of field "prima\_dose" aggregated by region; finally we draw the maximum in the same way as before:
 \begin{lstlisting}
-GET /somministrazioni-vaccini-latest/_search
+GET /somministrazioni_vaccini/_search
 {
   "size": 0,
   "query": {
@@ -308,7 +308,7 @@ GET /somministrazioni-vaccini-latest/_search
 \item \textbf{find the total number of boosters in Italy in last 30 days}.\\
 This query is quite easy; indeed, we have to filter the results by date and then return the sum of field "dose\_addizionale\_booster":
 \begin{lstlisting}
-GET /somministrazioni-vaccini-latest/_search
+GET /somministrazioni_vaccini/_search
 {
   "size": 0,
   "query": {
@@ -331,7 +331,7 @@ GET /somministrazioni-vaccini-latest/_search
 \item \textbf{find the age range with the highest number of vaccinations in the last 30 days.}
 The pattern is similar to the first query; namely, we use a script after having filtered the results by date to compute the sum of male and female vaccine doses and finally we return the maximum value:
 \begin{lstlisting}
-GET /somministrazioni-vaccini-latest/_search
+GET /somministrazioni_vaccini/_search
 {
   "size": 0,
   "query": {
@@ -376,7 +376,7 @@ GET /somministrazioni-vaccini-latest/_search
 \item \textbf{find the total number of Moderna doses received in the last 3 days in Italy}.\\
 We simply have to filter the data both by "fornitore" and date before computing the sum of field "numero\_dosi":
 \begin{lstlisting}
-GET /consegne-vaccini-latest/_search
+GET /consegne_vaccini/_search
 {
   "size": 0,
   "query": {
@@ -407,7 +407,7 @@ GET /consegne-vaccini-latest/_search
 \item \textbf{find the region with the highest disparity of vaccinations between males and females}.\\
 This query is more tricky than the previous one because it involves a script in which we have to compute the absolute value of a difference (we do not know whether there are more males that undergo vaccination or females, and we do not want to return negative values). The rest of the query is similar to the others:
 \begin{lstlisting}
-GET /somministrazioni-vaccini-latest/_search
+GET /somministrazioni_vaccini/_search
 {
   "size": 0,
     "runtime_mappings": {
@@ -445,7 +445,7 @@ GET /somministrazioni-vaccini-latest/_search
 \item \textbf{number of children between 5-11 vaccinated this week in Basilicata}.\\
 DOES NOT WORK
 \begin{lstlisting}
-   GET /somministrazioni-vaccini-latest/_count
+   GET /somministrazioni_vaccini/_count
 {
   "query": {
     "bool": {
@@ -475,7 +475,7 @@ DOES NOT WORK
 \item \textbf{brand of the less-used vaccine with young people (<30 years old)}.\\
 DOES NOT WORK
 \begin{lstlisting}
-GET /somministrazioni-vaccini-latest/_search
+GET /somministrazioni_vaccini/_search
 {
   "query": {
     "bool": {
@@ -525,7 +525,7 @@ We have identified the following commands to show how the system works:\\
     \item \textbf{Update one specific document (data of Abruzzo 2020/03/30 for age range 40-49 for Moderna) with specific data (100 males vaccinated and 2012 second doses)}.\\
     The construct we use is the "\_update\_by\_query" one, which can be used with the \verb|POST| method; we have to perform a query to find the document to update, and then we exploit a script (with parameters) to update the document:
 \begin{lstlisting}
-        POST /somministrazioni-vaccini-latest/_update_by_query
+POST /somministrazioni_vaccini/_update_by_query
 {
   "query": {
     "bool": {
@@ -558,7 +558,7 @@ We have identified the following commands to show how the system works:\\
 \item \textbf{Create one new document}.\\
 This command is the easiest; we simply have to make a \verb|POST| with "\_doc", and then specify a value for all the fields:
 \begin{lstlisting}
-        POST /somministrazioni-vaccini-latest/_doc
+POST /somministrazioni_vaccini/_doc
 {
   "data_somministrazione": "2021-12-28",
   "fornitore": "Moderna",
@@ -579,7 +579,7 @@ This command is the easiest; we simply have to make a \verb|POST| with "\_doc", 
 Runtime fields are fields evaluated at query time. They allow us to add fields to existing documents without reindexing data and to define additional fields without modifying the schema. Here, a useful runtime field might be the sum of the total doses, since in each record the doses are grouped by type of administration. By creating the runtime field \verb|dosi_totali|, we add an additional field to each record containing the desired information and to facilitate the creation of other queries.
 To create a runtime field, we have to use a script along with the \verb|PUT| method, specifying the name of the field, its type and its source:
 \begin{lstlisting}
-PUT somministrazioni-vaccini-latest/_mapping
+PUT somministrazioni_vaccini/_mapping
 {
   "runtime": {
     "dosi_totali": {
@@ -611,31 +611,37 @@ The dashboard displays the following information and graphs:
     \item delivered doses per week.
 \end{itemize}
 
-\subsection{Dashboard visualizations}
-In this section are provided screenshots of the various visualizations created on the Kibana Dashboard and a brief explanation of the information contained in each of them.
+\subsection{Dashboard initialization}
+To create the Kibana dashboard:
 \begin{itemize}
-    \item \textbf{Overview of the vaccine doses administrations}
+    \item Install the two datasets as it is explained in Section 3 (remember to name them   \verb|somministrazioni_vaccini| and \verb|consegne_vaccini|);
+    \item From the Dev Tools, run the command 3 (Add a runtime field), since some visualizations require the field \verb|dosi_totali|;
+    \item In the Maps tool, select "Add layer" and then "Upload GeoJSON". Then upload the \verb|.geo.json| file provided in the exports section and name the index "\verb|italyregions|"; 
+    \item Go to Stack Management (you can leave the Maps page without saving) and then to Saved Objects. Then upload the \verb|.ndjson| file provided in the exports section. It is not necessary to edit any import setting;
+    \item Go to the Dashboard section and open the Italy Vaccines dashboard;
+    \item Set a relevant time period (e.g. January 1st, 2021 - December 27th, 2021).
+\end{itemize}
+
+\subsection{Dashboard visualizations}
+In this section are provided screenshots of the various visualizations created on the Kibana Dashboard.
     \begin{figure}
         \centering
         \includegraphics[scale=0.3]{ir databases/screenshots/adm_overview.png}
         \caption{Overview of the vaccine doses administrations}
         \label{fig:adm_overview}
     \end{figure}
-    \item \textbf{Doses administration by region, visualized on the Italian territory}
     \begin{figure}
         \centering
         \includegraphics[scale=0.3]{ir databases/screenshots/map.png}
         \caption{Doses administration by region, visualized on the Italian territory}
         \label{fig:map}
     \end{figure}
-    \item \textbf{Administered doses per supplier}
     \begin{figure}
         \centering
         \includegraphics[scale=0.3]{ir databases/screenshots/adm_supplier.png}
         \caption{Administered doses per supplier}
         \label{fig:adm_supplier}
     \end{figure}
-    \item \textbf{Weekly administered doses, grouped by various metrics}
     \begin{figure}
         \centering
         \includegraphics[scale=0.3]{ir databases/screenshots/adm_weekly1.png}
@@ -648,21 +654,18 @@ In this section are provided screenshots of the various visualizations created o
         \caption{Weekly administered doses, grouped by gender}
         \label{fig:adm_weekly2}
     \end{figure}
-    \item \textbf{Overview of the vaccine deliveries}
     \begin{figure}
         \centering
         \includegraphics[scale=0.3]{ir databases/screenshots/del_overview.png}
         \caption{Overview of the vaccine deliveries}
         \label{fig:del_overview}
     \end{figure}
-    \item \textbf{Weekly delivered/administered doses comparison}
     \begin{figure}
         \centering
         \includegraphics[scale=0.3]{ir databases/screenshots/del_weekly.png}
         \caption{Weekly delivered/administered doses comparison}
         \label{fig:del_weekly}
     \end{figure}
-\end{itemize}
 
 
 
@@ -673,14 +676,4 @@ In this section are provided screenshots of the various visualizations created o
     \item \href{https://github.com/italia/covid19-opendata-vaccini}{Dataset}
     \item \href{https://app.diagrams.net}{draw.io}
 \end{itemize}
-
-
-\section{Image gallery}
-
-
-\begin{figure}[ht!]
-    \centering
-    \includegraphics[scale=0.3]{screenshots/insertvaccine.png}
-    \caption{Page for the insertion of a new vaccine dose to a person.}
-\end{figure}
 \end{document}
