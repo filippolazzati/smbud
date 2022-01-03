@@ -667,12 +667,72 @@ In this section are provided screenshots of the various visualizations created o
         \label{fig:del_weekly}
     \end{figure}
 
+\section{Cassandra}
+An alternative way to implement the vaccine administrations dataset can be to store it in a columnar database such as Cassandra. Columnar databases are particularly suitable for very large datasets and for analytical purposes such as aggregation operations on entire columns, such as retrieving the total number of administered doses. 
+\subsection{Dataset implementation}
+To implement the dataset in Cassandra, first of all start Cassandra, then move to the dataset folder and start the \verb|cqlsh| console.
+\begin{itemize}
+    \item Create a keyspace: 
+        \begin{lstlisting}
+        CREATE KEYSPACE somministrazioni WITH REPLICATION = {'class': 'SimpleStrategy', 'replication_factor':3};
+        \end{lstlisting}
+    \item Select the keyspace: 
+        \begin{lstlisting}
+        USE somministrazioni;
+        \end{lstlisting}
+    \item Create a table: 
+        \begin{lstlisting}
+        CREATE TABLE somministrazioni (  
+            data_somministrazione date,
+            fornitore text,
+            area text,
+            fascia_anagrafica text,
+            sesso_maschile varint,
+            sesso_femminile varint,
+            prima_dose varint,
+            seconda_dose varint,
+            pregressa_infezione varint,
+            dose_addizionale_booster varint,
+            codice_NUTS1 text,
+            codice_NUTS2 text,
+            codice_regione_ISTAT varint,
+            nome_area text,
+            PRIMARY KEY (codice_regione_istat, fornitore, fascia_anagrafica, data_somministrazione)
+        );
+        \end{lstlisting}
+    \item Import the dataset: 
+        \begin{lstlisting}
+        COPY somministrazioni (data_somministrazione, fornitore, area, fascia_anagrafica, sesso_maschile, sesso_femminile, prima_dose, seconda_dose, pregressa_infezione, dose_addizionale_booster, codice_NUTS1, codice_NUTS2, codice_regione_ISTAT, nome_area) FROM '<.csv dataset>' WITH HEADER = false;
+        \end{lstlisting}
+    \item Create an index on \verb|nome_area|: 
+        \begin{lstlisting}
+        CREATE INDEX regione ON somministrazioni (nome_area);
+        \end{lstlisting}
+\end{itemize}
+Now the dataset is ready to be queried.
 
+\subsection{Queries examples}
+Here are some examples of possible queries in CQL. Note that in aggregation queries, it is not possible to order the results by the aggregated value since in Cassandra ordering is possible only on clustering columns. 
+\begin{itemize}
+    \item Total number of administered doses: 
+        \begin{lstlisting}
+        SELECT sum(sesso_maschile)+sum(sesso_femminile) AS total_doses FROM somministrazioni;
+        \end{lstlisting}
+    \item Administered doses per supplier in June, 2021: 
+        \begin{lstlisting}
+        SELECT fornitore, sum(sesso_maschile)+sum(sesso_femminile) AS total_doses FROM somministrazioni WHERE data_somministrazione >= '2021-06-01' AND data_somministrazione <= '2021-06-30' GROUP BY codice_regione_ISTAT, fornitore ALLOW FILTERING;
+        \end{lstlisting}
+    \item Total number of booster doses in Lombardia since December 1st, 2021: 
+        \begin{lstlisting}
+        SELECT sum(dose_addizionale_booster) AS booster_doses FROM somministrazioni WHERE data_somministrazione >= '2021-12-01' AND nome_area = 'Lombardia' ALLOW FILTERING;
+        \end{lstlisting}
+\end{itemize}
 
 \section{References and sources}
 \begin{itemize}
     \item \href{https://www.elastic.co}{Elasticsearch}
     \item \href{https://www.elastic.co/kibana/}{Kibana}
+    \item \href{https://cassandra.apache.org/_/index.html}{Cassandra}
     \item \href{https://github.com/italia/covid19-opendata-vaccini}{Dataset}
     \item \href{https://app.diagrams.net}{draw.io}
 \end{itemize}
