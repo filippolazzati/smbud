@@ -442,56 +442,114 @@ GET /somministrazioni_vaccini/_search
   }
 }
 \end{lstlisting}
-\item \textbf{number of children between 5-11 vaccinated this week in Basilicata}.\\
-DOES NOT WORK
+\item \textbf{number of children between 5-11 vaccinated this week in Basilicata}.\\We have to filter the results by "fascia\_anagrafica", by "nome\_area" and by date. Then we have to exploit a script to sum the values of fields "prima\_dose", "seconda\_dose" and "dose\_addizionale\_booster". Finally we can find the number of children through the sum of "total\_doses" with the "aggs" function.
 \begin{lstlisting}
-   GET /somministrazioni_vaccini/_count
+  GET /somministrazioni_vaccini/_search
 {
+  "size": 0,
   "query": {
     "bool": {
-      "must": [
-	{ "match" : 
-	    "fascia_anagrafica": "5-11" 
-	},
-        { "range" : {
-	    "@timestamp": {
-		"gte": "now-7d/d",
-		"lte": "now/d"
-	    }
-        },
-        { "match" : {
-            "nome_area": "Basilicata"
+      "filter": [
+        {"term": {
+          "fascia_anagrafica": "5-11"
         }
-      ]
+        },
+        {"range": {
+      "@timestamp": {
+        "gte": "now-7d/d",
+        "lte": "now-1d/d"
+      }
+     }
+    },{"term":{
+      "nome_area": "Basilicata"
+    }}
+  ]}},
+  "runtime_mappings": {
+    "total_doses": {
+      "type": "long",
+      "script": """
+        long total = doc['prima_dose'].value + doc['seconda_dose'].value + doc['dose_addizionale_booster'].value;
+        emit(total);
+      """
+    }
+  },
+  "aggs": {
+    "number_of_children": {
+      "sum": {
+        "field": "total_doses"
+      }
     }
   }
 }
 \end{lstlisting}
-\item \textbf{to do}.\\
-DOES NOT WORK
+\item \textbf{Percentage of vaccinated people in Lombardia compared to total vaccines each month}.\\
+For this query we have aggragate by a date interval specified with calendar-aware time intervals ("calendar\_interval": "month"). Then, for each time interval, we retrive the total amount of vaccinated people ("vaccinati") using the "aggs" function and we find the vaccineted people in Lombardia exploiting the nested "aggs". Finally, to retrive the percentage of vaccinated people in Lombardia up to the total people in Italy, we have to exploit the "bucket\_script" aggregation to compute the division of the parameters "vaccinatiLombardia" and "vaccinati", multiplying the result by 100.
 \begin{lstlisting}
-   
+GET /somministrazioni_vaccini/_search
+{ 
+  "size": 0,
+  "aggs": {
+    "percentage_per_year": {
+      "date_histogram": {
+        "field": "data_somministrazione",
+        "calendar_interval": "month"
+      },
+      "aggs": {
+        "vaccinati": {
+          "sum": {
+            "field": "prima_dose"
+          }
+        },
+        "vaccinati_Lombardia": {
+          "filter": {
+            "term": {
+              "nome_area": "Lombardia"
+            }
+          },
+          "aggs": {
+            "dosi": {
+              "sum": {
+                "field": "prima_dose"
+              }
+            }
+          }
+        },
+        "vaccini_percentage": {
+          "bucket_script": {
+            "buckets_path": {
+              "vaccinatiLombardia": "vaccinati_Lombardia>dosi",
+              "vaccinati": "vaccinati"
+            },
+            "script": "params.vaccinatiLombardia / params.vaccinati * 100"
+          }
+        }
+      }
+    }
+  }
+}
 \end{lstlisting}
 \item \textbf{brand of the less-used vaccine with young people (<30 years old)}.\\
-DOES NOT WORK
+We have to filter the results through "bool" that retrieves data from all the specified fields ("fascia\_anagrafica") thanks to the "should" clause. Then we have to exploit a script to sum the values of fields "sesso\_maschile" and "sesso\_femminile". Then, we have to aggregate by brand ("fornitore") to compute meaningful sums. Finally, to retrieve the brand with the lowest number of vaccines administered we have to exploit the "min\_bucket" construct:
 \begin{lstlisting}
 GET /somministrazioni_vaccini/_search
 {
+  "size": 0,
   "query": {
     "bool": {
       "should": [
-	{ "match" : 
-	    "fascia_anagrafica": "5-11" 
-	},
-	{ "match" : 
-	    "fascia_anagrafica": "12-19" 
-	},
-        { "match" : 
-	    "fascia_anagrafica": "20-29" 
-	}
+	     {"match" : {
+	          "fascia_anagrafica": "5-11" 
+	     }},
+	     {"match" : {
+	          "fascia_anagrafica": "12-19" 
+	     }},
+       {"match" : {
+	          "fascia_anagrafica": "20-29" 
+	     }}
       ]
-   },
-    "runtime_mappings": {
+   }
+  },
+  "runtime_mappings": {
     "vaccini": {
       "type": "long",
       "script": """
@@ -499,22 +557,63 @@ GET /somministrazioni_vaccini/_search
         emit(total);
       """
     }
-   },
-   "aggs": {
-    "vaccinations_per_region": {
+  },
+  "aggs": {
+    "vaccinations_per_brand": {
       "terms": {
-        "field": "nome_area"
-     },
+        "field": "fornitore"
+      },
       "aggs": {
         "total_vaccinations": {
           "sum": {
             "field": "vaccini"
           }
-     },
-      "less-used_brand": {
-        "min_bucket": {
-          "buckets_path": "vaccinations_per_region > total_vaccinations" 
-     }
+        }
+      }
+    }
+  ,
+    "less-used_brand": {
+      "min_bucket": {
+        "buckets_path": "vaccinations_per_brand > total_vaccinations" 
+      }
+  }
+}
+}
+\end{lstlisting}
+\item \textbf{Percentage of vaccinated people with booster compared to total vaccines each year}.\\
+The pattern of this query is similar to the eighth one. We filter by "year" as date interval, then we retrive the total vaccinated people and the boostered ones to compute the percentage with the "bucket\_script" aggregation.
+\begin{lstlisting}
+GET /somministrazioni_vaccini/_search
+{ 
+  "size": 0,
+  "aggs": {
+    "percentage_per_year": {
+      "date_histogram": {
+        "field": "data_somministrazione",
+        "calendar_interval": "year"
+      },
+      "aggs": {
+        "vaccini": {
+          "sum": {
+            "field": "prima_dose"
+          }
+        },
+          "booster": {
+            "sum": {
+              "field": "dose_addizionale_booster"
+              }
+          },
+        "vaccini_percentage": {
+          "bucket_script": {
+            "buckets_path": {
+              "vacciniBooster": "booster",
+              "vaccini": "vaccini"
+            },
+            "script": "params.vacciniBooster / params.vaccini * 100"
+          }
+        }
+      }
+    }
   }
 }
 \end{lstlisting}
