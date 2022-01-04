@@ -241,10 +241,9 @@ GET /somministrazioni_vaccini/_search
   "runtime_mappings": {
     "vaccini": {
       "type": "long",
-      "script": """
-        long total = doc['sesso_maschile'].value + doc['sesso_femminile'].value;
-        emit(total);
-      """
+      "script": {
+        "source": "emit(doc['sesso_maschile'].value + doc['sesso_femminile'].value);"
+      }
     }
   },
   "aggs": {
@@ -345,10 +344,9 @@ GET /somministrazioni_vaccini/_search
   "runtime_mappings": {
     "vaccini": {
       "type": "long",
-      "script": """
-        long total = doc['sesso_maschile'].value + doc['sesso_femminile'].value;
-        emit(total);
-      """
+      "script": {
+        "source": "emit(doc['sesso_maschile'].value + doc['sesso_femminile'].value);"
+      }
     }
   },
   "aggs": {
@@ -413,14 +411,11 @@ GET /somministrazioni_vaccini/_search
     "runtime_mappings": {
       "vaccini": {
         "type": "long",
-        "script": """
-          long total = doc['sesso_maschile'].value - doc['sesso_femminile'].value;
-          if(total < 0){
-            total = total * - 1;
-          }
-          emit(total);
-      """
-    }},
+        "script": {
+          "source": "long total = doc['sesso_maschile'].value - doc['sesso_femminile'].value; if(total < 0){total = total * - 1; } emit(total)"
+        }
+      }
+    },
     "aggs": {
       "vaccinations_per_region":{
       "terms": {
@@ -445,42 +440,41 @@ GET /somministrazioni_vaccini/_search
 \item \textbf{number of children between 5-11 vaccinated this week in Basilicata}.\\We have to filter the results by "fascia\_anagrafica", by "nome\_area" and by date. Then we have to exploit a script to sum the values of fields "prima\_dose", "seconda\_dose" and "dose\_addizionale\_booster". Finally we can find the number of children through the sum of "total\_doses" with the "aggs" function.
 \begin{lstlisting}
   GET /somministrazioni_vaccini/_search
-{
-  "size": 0,
-  "query": {
-    "bool": {
-      "filter": [
-        {"term": {
-          "fascia_anagrafica": "5-11"
+  {
+    "size": 0,
+    "query": {
+      "bool": {
+        "filter": [
+          {"term": {
+            "fascia_anagrafica": "5-11"
+          }
+          },
+          {"range": {
+        "@timestamp": {
+          "gte": "now-7d/d",
+          "lte": "now-1d/d"
         }
-        },
-        {"range": {
-      "@timestamp": {
-        "gte": "now-7d/d",
-        "lte": "now-1d/d"
+       }
+      },{"term":{
+        "nome_area": "Basilicata"
+      }}
+    ]}},
+    "runtime_mappings": {
+      "total_doses": {
+        "type": "long",
+        "script": {
+            "source": "emit(doc['prima_dose'].value + doc['seconda_dose'].value + doc['dose_addizionale_booster'].value);"
+        }
       }
-     }
-    },{"term":{
-      "nome_area": "Basilicata"
-    }}
-  ]}},
-  "runtime_mappings": {
-    "total_doses": {
-      "type": "long",
-      "script": """
-        long total = doc['prima_dose'].value + doc['seconda_dose'].value + doc['dose_addizionale_booster'].value;
-        emit(total);
-      """
-    }
-  },
-  "aggs": {
-    "number_of_children": {
-      "sum": {
-        "field": "total_doses"
+    },
+    "aggs": {
+      "number_of_children": {
+        "sum": {
+          "field": "total_doses"
+        }
       }
     }
   }
-}
 \end{lstlisting}
 \item \textbf{Percentage of vaccinated people in Lombardia compared to total vaccines each month}.\\
 For this query we have aggragate by a date interval specified with calendar-aware time intervals ("calendar\_interval": "month"). Then, for each time interval, we retrive the total amount of vaccinated people ("vaccinati") using the "aggs" function and we find the vaccineted people in Lombardia exploiting the nested "aggs". Finally, to retrive the percentage of vaccinated people in Lombardia up to the total people in Italy, we have to exploit the "bucket\_script" aggregation to compute the division of the parameters "vaccinatiLombardia" and "vaccinati", multiplying the result by 100.
@@ -552,10 +546,9 @@ GET /somministrazioni_vaccini/_search
   "runtime_mappings": {
     "vaccini": {
       "type": "long",
-      "script": """
-        long total = doc['sesso_maschile'].value + doc['sesso_femminile'].value;
-        emit(total);
-      """
+      "script": {
+        "source": "emit(doc['sesso_maschile'].value + doc['sesso_femminile'].value);"
+      }
     }
   },
   "aggs": {
@@ -723,12 +716,12 @@ To create the Kibana dashboard:
 
 \subsection{Dashboard visualizations}
 In this section are provided screenshots of the various visualizations created on the Kibana Dashboard.
-    \begin{figure}
+    \begin{figure}[Ht]
         \centering
         \includegraphics[scale=0.3]{ir databases/screenshots/adm_overview.png}
         \caption{Overview of the vaccine doses administrations}
         \label{fig:adm_overview}
-    \end{figure}
+    \end{figure}[Ht]
     \begin{figure}
         \centering
         \includegraphics[scale=0.3]{ir databases/screenshots/map.png}
